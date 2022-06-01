@@ -4,6 +4,7 @@ import useAdoptionsStore from './adoptions.store'
 import randomName from './pets.name'
 import { Button } from './UI'
 import { PlusIcon, UploadIcon, CheckIcon } from '@heroicons/react/solid'
+import {getQuery} from './query'
 
 function useSelected(): [Set<string>, (str: string) => void, () => void] {
 
@@ -29,9 +30,11 @@ export default function Pets() {
 
     const petAdder = usePetAdder()
     const addPet = petAdder.mutate
+    const location = getQuery('location')
+
 
   // const pets = usePetStore(s => s.pets)
-    const { isLoading, error, data } = usePets()
+    const { isLoading, error, data } = usePets(location)
     const rows = data || []
   // const rows = Object.values(pets)
   rows.reverse()
@@ -46,9 +49,9 @@ export default function Pets() {
 
   const [name, setName] = useState(randomName())
   const onAdd = useCallback(() => {
-    addPet({ name })
+    addPet({ name, location })
     setName(randomName())
-  }, [name, addPet, setName])
+  }, [name, addPet, setName, location]) 
 
     if (isLoading) return <span> 'Loading...' </span>
 

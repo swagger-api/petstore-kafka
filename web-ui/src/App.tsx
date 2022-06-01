@@ -1,13 +1,22 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Pets from './Pets'
 import Adoptions from './Adoptions'
 import useAdoptionsStore from './adoptions.store'
 import usePetsStore from './pets.store'
 import { Button } from './UI'
+import {setQuery, getQuery} from './query'
 
 function App() {
-    const [location, setLocation] = useState('Plett')
-    const adoptions = Object.values(useAdoptionsStore(s => s.adoptions))
+  const adoptions = Object.values(useAdoptionsStore(s => s.adoptions))
+  let location = getQuery('location')
+
+  useEffect(() => {
+    if(!location) {
+      setQuery('location', 'Plett')
+    }
+  }, [location])
+
+  const [locationInput, setLocationInput] = useState(location)
     const pets = Object.values(usePetsStore(s => s.pets))
 
     return (
@@ -17,8 +26,8 @@ function App() {
 	    <h2>Location</h2>
 	    <div className="flex" >
 
-	    <input className="ml-2 px-2.5 py-1 border rounded-md" value={location} onChange={(e:any) => {setLocation(e.target.value)}} type="text" />
-	    <Button className="ml-2" color='blue'> Change location</Button> 
+	    <input id="location-input" className="ml-2 px-2.5 py-1 border rounded-md" value={locationInput} onChange={(e) => { setLocationInput(e.target.value) }} type="text" />
+	    <Button className="ml-2" color='blue' onClick={() => setQuery('location', locationInput)}> Change location</Button> 
 	    <Button className="ml-2" color='blue'> Open in new Tab</Button> 
 	    </div>
 	  </div>

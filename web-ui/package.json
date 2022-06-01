@@ -40,7 +40,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3001",
+  "proxy": "http://localhost:3100",
   "devDependencies": {
     "@heroicons/react": "^1.0.6",
     "@types/uuid": "^8.3.4",
