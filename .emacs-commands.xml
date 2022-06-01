@@ -1,0 +1,78 @@
+<emacs>
+  <command title="Start" dir="." >
+
+    <cmd>
+      nix-shell --run "docker-compose up"
+    </cmd>
+
+  </command>
+
+  <command title="Subscribe to Topic" dir="." >
+
+    <cmd>
+      nix-shell --run "kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic $TOPIC --from-beginning"
+    </cmd>
+
+    <arg name="TOPIC">
+      <value> pets.added </value>
+      <value> pets.statusChanged </value>
+      <value> __consumer_offsets </value>
+
+    </arg>
+
+  </command>
+
+
+  <command title="Post to Topic" dir="." >
+
+    <cmd>
+      nix-shell --run "echo '{\"name\": \"$NAME\"}' | kafka-console-producer.sh --bootstrap-server localhost:9092 --topic $TOPIC"
+    </cmd>
+
+    <arg name="NAME" default="Fido">
+    </arg>
+
+    <arg name="TOPIC">
+      <value> pets.added </value>
+      <value> pets.statusChanged </value>
+    </arg>
+
+  </command>
+
+
+  <!-- <command title="Purge Topic" dir="." > -->
+
+  <!--   <cmd> -->
+  <!--     nix-shell -\-run "kafka-configs.sh -\-bootstrap-server localhost:9092 -\-alter -\-entity-type topics -\-entity-name $TOPIC -\-add-config retention.ms=1000 &amp;&amp; sleep 5 &amp;&amp; kafka-configs.sh -\-bootstrap-server localhost:9092 -\-alter -\-entity-type topics -\-entity-name $TOPIC -\-delete-config retention.ms" -->
+  <!--   </cmd> -->
+
+  <!--   <arg name="TOPIC"> -->
+  <!--     <value> pets.added </value> -->
+  <!--     <value> pets.statusChanged </value> -->
+  <!--   </arg> -->
+
+  <!-- </command> -->
+
+
+  <command title="Purge Topic Now" dir="." >
+
+    <cmd>
+      nix-shell --run "kafka-delete-records.sh --bootstrap-server localhost:9092 --offset-json-file $TOPIC_FILE"
+    </cmd>
+
+    <arg name="TOPIC_FILE" file-from="*.delete.json">
+    </arg>
+
+  </command>
+
+
+
+  <command title="Start web-ui" dir="./web-ui" >
+
+    <cmd>
+      nix-shell --run "yarn start"
+    </cmd>
+
+  </command>
+
+</emacs>

@@ -1,0 +1,15 @@
+# Gateway - Pets
+GET http://localhost:4000/api/pets
+
+# Gateway - SPA
+GET http://localhost:4000/
+
+
+# Pets - Get
+GET http://localhost:3100/api/pets
+
+# Pets - Add
+POST http://localhost:3100/api/pets
+Content-Type: application/json
+
+{"name": "Foolie", "location": "Plett"}
