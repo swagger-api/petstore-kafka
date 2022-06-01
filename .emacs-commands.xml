@@ -75,4 +75,13 @@
 
   </command>
 
+
+  <command title="Start Pets" dir="./pets" >
+
+    <cmd>
+      nix-shell --run "yarn run dev"
+    </cmd>
+
+  </command>
+
 </emacs>

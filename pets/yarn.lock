@@ -410,6 +410,13 @@ finalhandler@1.2.0:
     statuses "2.0.1"
     unpipe "~1.0.0"
 
+flat-file-db@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/flat-file-db/-/flat-file-db-1.0.0.tgz#08ccbd71326ce2ac31f1cc9607ba713cb8b678fb"
+  integrity sha512-NjERic1BVfG8kHGP/v6HcHRcnUYFw9V4BGLl28cCvyGHW69HxkBP9RVKUJzBpF37McwWcwCzO9gONTljR0LCtg==
+  dependencies:
+    mkdirp "~0.3.5"
+
 forwarded@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
@@ -739,6 +746,11 @@ minimist@^1.2.0:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
   integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
+
+mkdirp@~0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.3.5.tgz#de3e5f8961c88c787ee1368df849ac4413eca8d7"
+  integrity sha512-8OCq0De/h9ZxseqzCH8Kw/Filf5pF/vMI6+BH7Lu0jXz2pqYCjTAQRolSxRIi+Ax+oCCjlxoJMP0YQ4XlrQNHg==
 
 morgan@^1.10.0:
   version "1.10.0"
