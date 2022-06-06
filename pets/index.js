@@ -20,13 +20,14 @@ dbOpen('./pets.db')
 // ---------------------------------------------------------------
 // Kafka
 const kafka = new Kafka({
-    logLevel: logLevel.INFO,
-    brokers: BROKERS,
-    clientId: CLIENT_ID,
-    retry: {
-	initialRetryTime: 1000,
-	retries: 16
-    }})
+  logLevel: logLevel.INFO,
+  brokers: BROKERS,
+  clientId: CLIENT_ID,
+  retry: {
+    initialRetryTime: 1000,
+    retries: 16
+  }
+})
 
 const consumers = []
 const producer = kafka.producer()
@@ -35,70 +36,80 @@ producer.connect()
 
 // Consume kafka
 async function subscribeToPetsAdded () {
-    const consumerGroup = 'pets-added-sink'
-    try {
-	const consumer = kafka.consumer({ groupId: consumerGroup})
-	await consumer.connect()
-	consumers.push(consumer)
-	await consumer.subscribe({ topic: 'pets.added', fromBeginning: true })
-	await consumer.run({
-            autoCommit: false,
-	    eachMessage: async ({ topic, partition, message }) => {
-		const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-		console.log(`- ${prefix} ${message.key}#${message.value}`)
-                const pet = JSON.parse(message.value)
+  const consumerGroup = 'pets-added-sink'
+  try {
+    const consumer = kafka.consumer({ groupId: consumerGroup})
+    await consumer.connect()
+    consumers.push(consumer)
+    await consumer.subscribe({ topic: 'pets.added', fromBeginning: true })
+    await consumer.run({
+      autoCommit: false,
+      eachMessage: async ({ topic, partition, message }) => {
+        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+        console.log(`- ${prefix} ${message.key}#${message.value}`)
+        const pet = JSON.parse(message.value)
 
-                // Initial status of PENDING
-                pet.status = 'pending' // This status doesn't trigger an event. It should live for a very short time.
+        // Initial status of PENDING
+        pet.status = 'pending' // This status doesn't trigger an event. It should live for a very short time.
 
-                // Save to DB
-                dbPut(pet.id, pet)
-		dbPut(`${consumerGroup}.offset`, message.offset + 1)
-		consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
+        // Save to DB
+        dbPut(pet.id, pet)
+        dbPut(`${consumerGroup}.offset`, message.offset + 1)
+        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
 
-                // Produce: pets.statusChanged
-                // It's now available
-		producer.send({
-		    topic: 'pets.statusChanged',
-		    messages: [
-			{ value: JSON.stringify({ ...pet, status: 'available'}) },
-	            ],
-                })
-	    },
-	})
-        const dbOffset = dbGet(`${consumerGroup}.offset`) || 0
-	await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
-    } catch(e) {
-	console.error(`[${consumerGroup}] ${e.message}`, e)   
+        // Produce: pets.statusChanged
+        // It's now available
+        producer.send({
+          topic: 'pets.statusChanged',
+          messages: [
+            { value: JSON.stringify({ ...pet, status: 'available'}) },
+          ],
+        })
+      },
+    })
+    const dbOffset = dbGet(`${consumerGroup}.offset`) || -1
+    if(dbOffset < 0) {
+      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
+      await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
+    } else {
+      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
     }
+  } catch(e) {
+    console.error(`[${consumerGroup}] ${e.message}`, e)   
+  }
 }
 
 async function subscribeToPetsStatusChanged () {
-    const consumerGroup = 'pets-statusChanged-sink'
-    try {
-	const consumer = kafka.consumer({ groupId: consumerGroup})
-	await consumer.connect()
-	consumers.push(consumer)
-	await consumer.subscribe({ topic: 'pets.statusChanged', fromBeginning: true })
-	await consumer.run({
-            autoCommit: false,
-	    eachMessage: async ({ topic, partition, message }) => {
-		const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-		console.log(`- ${prefix} ${message.key}#${message.value}`)
-                const {id, status} = JSON.parse(message.value)
+  const consumerGroup = 'pets-statusChanged-sink'
+  try {
+    const consumer = kafka.consumer({ groupId: consumerGroup})
+    await consumer.connect()
+    consumers.push(consumer)
+    await consumer.subscribe({ topic: 'pets.statusChanged', fromBeginning: true })
+    await consumer.run({
+      autoCommit: false,
+      eachMessage: async ({ topic, partition, message }) => {
+        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+        console.log(`- ${prefix} ${message.key}#${message.value}`)
+        const {id, status} = JSON.parse(message.value)
 
-                // Save to DB with new status
-                const pet = dbGet(id)
-                dbPut(id, {...pet, status})
-		dbPut(`${consumerGroup}.offset`, message.offset + 1)
-                consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
-	    },
-	})
-        const dbOffset = dbGet(`${consumerGroup}.offset`) || 0
-	await consumer.seek({ topic: 'pets.statusChanged', partition: 0, offset: dbOffset })
-    } catch(e) {
-	console.error(`[${consumerGroup}] ${e.message}`, e)   
+        // Save to DB with new status
+        const pet = dbGet(id)
+        dbPut(id, {...pet, status})
+        dbPut(`${consumerGroup}.offset`, message.offset + 1)
+        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
+      },
+    })
+    const dbOffset = dbGet(`${consumerGroup}.offset`) || -1
+    if(dbOffset < 0) {
+      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
+      await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
+    } else {
+      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
     }
+  } catch(e) {
+    console.error(`[${consumerGroup}] ${e.message}`, e)   
+  }
 }
 
 subscribeToPetsAdded()
@@ -112,46 +123,46 @@ app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/api/pets', (req, res) => {
-    const { location, status } = req.query
-    if(!location && !status) {
-        return res.json(dbGetAll())
-    }
+  const { location, status } = req.query
+  if(!location && !status) {
+    return res.json(dbGetAll())
+  }
 
-    return res.json(dbQuery({ location, status }, { caseInsensitive: true }))
+  return res.json(dbQuery({ location, status }, { caseInsensitive: true }))
 })
 
 app.post('/api/pets', (req, res) => {
-    const pet = req.body
-    pet.id = pet.id || uuid.v4()
+  const pet = req.body
+  pet.id = pet.id || uuid.v4()
 
-    producer.send({
-	topic: 'pets.added',
-	messages: [
-	    { value: JSON.stringify(pet) },
-	],
-    })
+  producer.send({
+    topic: 'pets.added',
+    messages: [
+      { value: JSON.stringify(pet) },
+    ],
+  })
 
-    res.status(201).send(pet)
+  res.status(201).send(pet)
 })
 
 app.patch('/api/pets/:id', (req, res) => {
-    const pet = dbGet(req.params.id)
-    const { status } = req.body
-    if(!pet)
-        res.status(400).json({
-            message: 'Pet not found, cannot patch.'
-        })
-
-    const updatedPet = {...pet, status }
-
-    producer.send({
-	topic: 'pets.statusChanged',
-	messages: [
-	    { value: JSON.stringify(updatedPet) },
-	],
+  const pet = dbGet(req.params.id)
+  const { status } = req.body
+  if(!pet)
+    res.status(400).json({
+      message: 'Pet not found, cannot patch.'
     })
 
-    res.status(201).send(updatedPet)
+  const updatedPet = {...pet, status }
+
+  producer.send({
+    topic: 'pets.statusChanged',
+    messages: [
+      { value: JSON.stringify(updatedPet) },
+    ],
+  })
+
+  res.status(201).send(updatedPet)
 })
 
 // // SPA
@@ -169,8 +180,8 @@ const server = app.listen(process.env.NODE_PORT || 3100, () => {
 // Keep track of connections to kill 'em off later.
 let connections = []
 server.on('connection', connection => {
-    connections.push(connection);
-    connection.on('close', () => connections = connections.filter(curr => curr !== connection));
+  connections.push(connection);
+  connection.on('close', () => connections = connections.filter(curr => curr !== connection));
 });
 
 // Exit gracefully
@@ -179,9 +190,9 @@ const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
 errorTypes.forEach(type => {
   process.on(type, async e => {
     try {
-	console.log(`process.on ${type}`)
-	console.error(e)
-        await shutdown()
+      console.log(`process.on ${type}`)
+      console.error(e)
+      await shutdown()
     } catch (_) {
       process.exit(1)
     }
@@ -192,7 +203,7 @@ errorTypes.forEach(type => {
 signalTraps.forEach(type => {
   process.once(type, async () => {
     try {
-	await shutdown()
+      await shutdown()
     } finally {
       process.kill(process.pid, type)
     }
@@ -201,19 +212,19 @@ signalTraps.forEach(type => {
 
 
 async function shutdown() {
-    await Promise.all(consumers.map(consumer => consumer.disconnect()))
+  await Promise.all(consumers.map(consumer => consumer.disconnect()))
 
-    server.close(() => {
-	console.log('Closed out remaining connections');
-	process.exit(0);
-    });
+  server.close(() => {
+    console.log('Closed out remaining connections');
+    process.exit(0);
+  });
 
-    setTimeout(() => {
-	console.error('Could not close connections in time, forcefully shutting down');
-	process.exit(1);
-    }, 5000);
+  setTimeout(() => {
+    console.error('Could not close connections in time, forcefully shutting down');
+    process.exit(1);
+  }, 5000);
 
-    connections.forEach(curr => curr.end());
-    setTimeout(() => connections.forEach(curr => curr.destroy()), 5000);
+  connections.forEach(curr => curr.end());
+  setTimeout(() => connections.forEach(curr => curr.destroy()), 5000);
 }
 
