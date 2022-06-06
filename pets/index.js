@@ -23,7 +23,11 @@ const kafka = new Kafka({
     logLevel: logLevel.INFO,
     brokers: BROKERS,
     clientId: CLIENT_ID,
-})
+    retry: {
+	initialRetryTime: 1000,
+	retries: 16
+    }})
+
 const consumers = []
 const producer = kafka.producer()
 producer.connect()

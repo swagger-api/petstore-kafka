@@ -11,7 +11,6 @@ export default function Adoptions() {
 
   return (
     <div>
-	<h2 className="text-2xl ml-4">Adoptions</h2>
 	{adoptions.map(a => (
 	    
 	    <div className="mt-2 border-gray-400 border p-4 rounded-md" >

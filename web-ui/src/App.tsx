@@ -5,6 +5,7 @@ import useAdoptionsStore from './adoptions.store'
 import usePetsStore from './pets.store'
 import { Button } from './UI'
 import {setQuery, getQuery} from './query'
+import WebsocketConsole from './WebsocketConsole'
 
 function App() {
   const adoptions = Object.values(useAdoptionsStore(s => s.adoptions))
@@ -47,16 +48,21 @@ function App() {
 
 	  <div className="flex" >
 	    <div className="p-8 flex-1" >
-	      <h2 className="text-2xl ml-4">Pets</h2>
+	      <h2 className="text-2xl ml-4">Pets in {location}</h2>
 	      <div className="mt-2" >
 		<Pets />
 	      </div>
 	    </div>
 
 	    <div className="p-8 flex-1" >
-	      <Adoptions/>
+	      <h2 className="text-2xl ml-4">Adoptions in {location}</h2>
+	      <div className="mt-2" >
+	        <Adoptions/>
+	      </div>
             </div>
           </div>
+
+	<WebsocketConsole location={location}/>
 
         </div>
     );

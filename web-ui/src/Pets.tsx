@@ -72,58 +72,60 @@ export default function Pets() {
 	      <Button onClick={requestAdoption} disabled={!selectedRows.size} color='orange' size='xs' className="ml-2 flex items-center" > <UploadIcon className="h-6 mr-2"  /> Adopt selected pets</Button>
 	      </div>
 	    </div>
-
-            <table className="mt-4 min-w-full divide-y divide-gray-200">
-              <thead className="sticky">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-left text-xs text-gray-700 uppercase tracking-wider" >
-                    Name
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" >
-                    Status
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-right" >
-                    <Button onClick={deselectAll} color='blue' className="ml-2 text-xs" disabled={!selectedRows.size}>Deselect</Button>
-		  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {rows.map((row) => (
-                  <tr key={row.id} onClick={() => toggleRow(row.id)} className={`odd:bg-gray-50 cursor-pointer`}>
-
-                      <td className="px-4 py-4 whitespace-nowrap">
-			<div className="flex items-center">
-                          <div className="ml-4">
-			    <div className="text-sm font-medium text-gray-900">
-			      {row.name}
-			    </div>
-                          </div>
-			</div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-			<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 uppercase">
-			  {row.status}
-			</span>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-			<div className="flex items-center justify-end">
-                          <div className="flex-shrink-0 h-4 w-4 text-gray-600 relative">
-			    {selectedRows.has(row.id) && <CheckIcon className="absolute h-5 text-white left-[-1px] top-[3px]" /> }
-			<input className="appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-500 checked:border-blue-800 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2" type="checkbox" onClick={(e) => e.stopPropagation()} checked={selectedRows.has(row.id)} />
-			  </div>
-			</div>
-                      </td>
+	    <div className="h-[400px] overflow-y-auto" >
+	      <table className="mt-4 min-w-full divide-y divide-gray-200">
+		<thead className="sticky">
+		  <tr className="bg-white sticky top-0" >
+		    <th scope="col" className="px-4 py-3 text-left text-xs text-gray-700 uppercase tracking-wider" >
+		      Name
+		    </th>
+		    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" >
+		      Status
+		    </th>
+		    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-right" >
+		      <Button onClick={deselectAll} color='blue' className="ml-2 text-xs" disabled={!selectedRows.size}>Deselect</Button>
+		    </th>
 		  </tr>
-                ))}
-                {rows.length ? null : (
-                  <tr>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center">No rows. Try reset filters </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+		</thead>
+		<tbody className="bg-white divide-y divide-gray-200 h-[400px]">
+		  {rows.map((row) => (
+		      <tr key={row.id} onClick={() => toggleRow(row.id)} className={`odd:bg-gray-50 cursor-pointer`}>
+
+			<td className="px-4 py-4 whitespace-nowrap">
+			  <div className="flex items-center">
+			    <div className="ml-4">
+			      <div className="text-sm font-medium text-gray-900">
+				{row.name}
+			      </div>
+			    </div>
+			  </div>
+			</td>
+			<td className="px-4 py-4 whitespace-nowrap">
+			  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 uppercase">
+			    {row.status}
+			  </span>
+			</td>
+			<td className="px-4 py-4 whitespace-nowrap">
+			  <div className="flex items-center justify-end">
+			    <div className="flex-shrink-0 h-4 w-4 text-gray-600 relative">
+			      {selectedRows.has(row.id) && <CheckIcon className="absolute h-5 text-white left-[-1px] top-[3px]" /> }
+			      <input className="appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-500 checked:border-blue-800 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2" type="checkbox" onClick={(e) => e.stopPropagation()} checked={selectedRows.has(row.id)} />
+			    </div>
+			  </div>
+			</td>
+		      </tr>
+		  ))}
+		  {rows.length ? null : (
+		      <tr>
+			<td className="px-4 py-4 whitespace-nowrap">
+			  <div className="flex items-center">No rows. Try reset filters </div>
+			</td>
+                      </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
           </div>
         </div>
       </div>

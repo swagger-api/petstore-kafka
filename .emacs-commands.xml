@@ -84,4 +84,13 @@
 
   </command>
 
+
+  <command title="Start Websocket" dir="./websocket" >
+
+    <cmd>
+      nix-shell --run "yarn run dev"
+    </cmd>
+
+  </command>
+
 </emacs>
