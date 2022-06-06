@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { dbOpen, dbPut, dbGet, dbGetAll, dbQuery } = require('./db.js')
+const { dbOpen, dbPut, dbGet, dbGetAll, dbQuery } = require('../lib').db
 
 // Configs
 const BROKERS = process.env.BROKERS || ['localhost:9092']

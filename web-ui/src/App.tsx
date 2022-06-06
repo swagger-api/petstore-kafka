@@ -6,6 +6,7 @@ import { Button } from './UI'
 import {setQuery, getQuery} from './query'
 import WebsocketConsole from './WebsocketConsole'
 import usePetsStore from './pets.store'
+import {connect as wsConnect} from './websocket'
 
 const newTab = () => {
   window.open(window.location.href, '_blank')
@@ -20,7 +21,14 @@ function App() {
     if (!location) {
       // Reloads the page
       setQuery('location', 'Plett')
+      return 
     }
+
+    return wsConnect({
+      location,
+      url: 'ws://0.0.0.0:3300'
+    })
+
   }, [])
 
   const pets = Object.values(usePetsStore(s => s.pets))
@@ -73,7 +81,6 @@ function App() {
       </div>
 
       <div>
-        <WebsocketConsole location={location} />
       </div>
 
     </div>

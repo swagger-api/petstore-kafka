@@ -29,54 +29,34 @@ function useSelected(): [Set<string>, (str: string) => void, () => void] {
 export default function Pets() {
 
   const fetchPets = usePetStore(s => s.fetchPets)
-  const connectToApi = usePetStore(s => s.connect)
   const addPet = usePetStore(s => s.addPet)
-  const petError = usePetStore(s => s.petError)
-  const websocketError = usePetStore(s => s.websocketError)
-  const errors = [petError, websocketError].filter(a => a)
   const pets = usePetStore(s => s.pets)
   const location = getQuery('location')
-
-  useEffect(() => {
-    if(!location)
-      return
-    return connectToApi({
-      location,
-      websocketUrl: 'ws:0.0.0.0:3300'
-    })
-  }, [])
 
   const rows = Object.values(pets) || []
   rows.reverse()
   const [selectedRows, toggleRow, deselectAll] = useSelected()
 
   useEffect(() => {
-    fetchPets()
+    fetchPets({ location })
   }, [location])
 
   const addAdoption = useAdoptionsStore(s => s.addAdoption)
   const requestAdoption = () => {
     deselectAll()
-    addAdoption(Array.from(selectedRows))
+    addAdoption({ pets: Array.from(selectedRows) })
   }
 
   const [name, setName] = useState(randomName())
   const onAdd = useCallback(() => {
-    addPet({ name })
+    addPet({ name, location })
     setName(randomName())
-  }, [name, addPet, setName ])
+  }, [name, addPet, setName, location ])
 
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-
-          {petError ? (
-            <pre>
-            {errors.map(e => (<div> { e } </div> ))}
-            </pre>
-            
-          ) : null }
 
           <div className="overflow-hidden border-b sm:rounded-lg">
             <div className="flex justify-between mt-1">

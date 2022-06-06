@@ -17,23 +17,6 @@ export function useAdoptions() {
     )
 }
 
-export function useAdoptionAdopter() {
-  const queryClient = useQueryClient()
-  return useMutation((petIds: string[]) => {
-    return fetch('/api/adoptions', {
-      method: 'POST',
-      headers: {
-	'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({pets: petIds}),
-    })
-    
-  }, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('adoptions')
-    }
-  })
-}
 
 
 

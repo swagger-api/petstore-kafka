@@ -1,4 +1,5 @@
 import create from 'zustand'
+import { onMessage } from './websocket'
 
 const READYSTATE = {
   CONNECTING: 0,
@@ -41,82 +42,15 @@ export class PetsAPI {
 const api = new PetsAPI('/api')
 
 const useStore = create<{
-  websocketError?: string;
   petError?: string;
-  location: string;
-  websocket: WebSocket | null;
   pets: {
     [key:string]: Pet
   };
-  addPet(newPet: {name: string}): void;
-  fetchPets(): void;
-  connect({ location, websocketUrl }: {location: string; websocketUrl: string}): () => void;
-  disconnect(): void;
+  addPet(newPet: {name: string; location: string;}): void;
+  fetchPets({location}: {location: string}): void;
 }>((set, get) => ({
-  location: '',
-  websocket: null,
   pets: {},
-  disconnect: () => {},
-  connect: ({ location, websocketUrl }) => {
-    console.log("Connecting to WebSocket with location = " + location)
-    let {disconnect, websocket } = get()
-    set({ websocketError: '' })
-    disconnect()
-
-    websocket = new WebSocket(websocketUrl)
-
-    websocket.addEventListener('open', () => {
-      console.log('Connected to WebsocketAPI')
-      if(!websocket || websocket.readyState !== READYSTATE.OPEN)
-        return
-      websocket.send(JSON.stringify({
-        location
-      }))
-    })
-
-    websocket.addEventListener('message', (msg) => {
-      try {
-        console.log('Received WebsocketAPI message: ' + msg.data)
-        const json: any = JSON.parse(msg.data)
-        if (json.topic === 'pets.added') {
-          set(state => {
-            return {
-              pets: { ...state.pets, [json.log.id]: json.log }
-            }
-          })
-        }
-
-        if (json.topic === 'pets.statusChanged') {
-          set(state => {
-            return {
-              pets: { ...state.pets, [json.log.id]: json.log }
-            }
-          })
-        }
-      } catch (e) {
-        set({ websocketError: e + '' })
-      }
-    })
-
-    websocket.addEventListener('error', (event) => {
-      if(!websocket)
-        return
-      console.log('WebsocketAPI Error')
-      console.error(event)
-      set({ websocketError: event + '' })
-    })
-
-    const wrappedDisconnect = () => {
-      if(websocket)
-        websocket.close()
-      set({ disconnect: () => {} })
-    }
-
-    set({ disconnect: wrappedDisconnect, location, websocket })
-    return wrappedDisconnect
-  },
-  addPet: async ({ name }) => {
-    const { location } = get()
+  addPet: async ({ name, location }) => {
     try {
       await api.addPet({ name, location })
       set(() => ({ petError: '' }))
@@ -124,15 +58,28 @@ const useStore = create<{
       set(() => ({ petError: e+'' }))
     }
   },
-  fetchPets: async () => {
+  fetchPets: async ({location}: {location: string}) => {
     try {
-      const pets = await api.getPets(get().location)
+      const pets = await api.getPets(location)
       set(() => ({ petError: '', pets: arrayToObject(pets, 'id') }))
     } catch (e) {
       set(() => ({ petError: e+'' }))
     }
   }
 }))
+
+// WebSocket connection
+onMessage((json: any, websocket: WebSocket) => {
+  if(json.type === 'kafka' && json.topic.startsWith('pets.')) {
+    const pet: Pet = json.log
+    useStore.setState(state => {
+      return {
+        pets: {...state.pets, [pet.id]: pet }
+      }
+    })
+  }
+})
+
 
 export default useStore
 

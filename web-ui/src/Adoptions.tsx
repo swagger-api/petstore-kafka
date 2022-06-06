@@ -1,11 +1,16 @@
-import {useMemo} from 'react'
+import {useEffect, useMemo} from 'react'
 import useAdoptionsStore from './adoptions.store'
 import usePetsStore from './pets.store'
 import { Button } from './UI'
 import {Pill} from './UI'
 
 export default function Adoptions() {
+  // const fetchAdoptions = useAdoptionsStore(s => s.fet)
   const adoptions = Object.values(useAdoptionsStore(s => s.adoptions))
+  useEffect(() => {
+
+    
+  }, [])
   adoptions.reverse()
   const pets = usePetsStore(s => s.pets)
 

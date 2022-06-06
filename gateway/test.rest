@@ -1,13 +1,15 @@
 # Gateway - Pets
 GET http://localhost:4000/api/pets
 
+# Gateway - Adoptions
+GET http://localhost:4000/api/adoptions
+
 # Gateway - SPA
 GET http://localhost:4000/
 
 
 # Pets - Get
 GET http://localhost:3100/api/pets
-
 
 # Pets - Get location=Plett
 GET http://localhost:3100/api/pets?location=office
@@ -23,3 +25,10 @@ PATCH http://localhost:3100/api/pets/994e1d3d-9243-4636-8286-bac667b3fdbb
 content-type: application/json
 
 {"status": "adopted"}
+
+
+# Gateway - Adoptions add
+POST http://localhost:4000/api/adoptions
+content-type: application/json
+
+{"pets": ["a", "b"]}
