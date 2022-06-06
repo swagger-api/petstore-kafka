@@ -45,7 +45,7 @@ async function subscribeToAll () {
         }
         
         eachSocketInLocation(location, (socket) => {
-          socket.send(JSON.stringify({ topic, log }))
+          socket.send(JSON.stringify({ type: 'kafka', topic, log }))
         })
 
 	    },
@@ -81,13 +81,13 @@ ws.on('connection', (socket) => {
 	    let msg = JSON.parse(str)
       
       if(!msg.location) {
-		    socket.send(JSON.stringify({ok: false, reasons: ['Missing .location field in handshake']}))
+		    socket.send(JSON.stringify({type: 'handshake', ok: false, reasons: ['Missing .location field in handshake']}))
 		    return 
       }
       const location = (msg.location+'').toLowerCase()
 	    socketsForLocation[location] = socketsForLocation[location] || []
 	    socketsForLocation[location].push(socket)
-	    socket.send(JSON.stringify({ok: true, message: `Successfully subscribed to "${location}" changes`}))
+	    socket.send(JSON.stringify({type: 'handshake', ok: true, reasons: [`Successfully subscribed to "${location}" changes`]}))
 	    
     } catch(e) {
       console.error(e)
