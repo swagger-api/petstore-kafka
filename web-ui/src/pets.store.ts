@@ -1,12 +1,6 @@
 import create from 'zustand'
 import { onMessage } from './websocket'
-
-const READYSTATE = {
-  CONNECTING: 0,
-  OPEN: 1,
-  CLOSING: 2,
-  CLOSED: 3,
-}
+import {arrayToObject} from './utils'
 
 interface Pet {
   id: string;
@@ -32,7 +26,7 @@ export class PetsAPI {
     return fetch(`${this.url}/pets`, {
       method: 'POST',
       headers: {
-	'Content-Type': 'application/json'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ name, location }),
     })
@@ -48,7 +42,7 @@ const useStore = create<{
   };
   addPet(newPet: {name: string; location: string;}): void;
   fetchPets({location}: {location: string}): void;
-}>((set, get) => ({
+}>((set) => ({
   pets: {},
   addPet: async ({ name, location }) => {
     try {
@@ -69,7 +63,7 @@ const useStore = create<{
 }))
 
 // WebSocket connection
-onMessage((json: any, websocket: WebSocket) => {
+onMessage((json: any) => {
   if(json.type === 'kafka' && json.topic.startsWith('pets.')) {
     const pet: Pet = json.log
     useStore.setState(state => {
@@ -83,11 +77,3 @@ onMessage((json: any, websocket: WebSocket) => {
 
 export default useStore
 
-function arrayToObject(arr: object[], key: string = 'id') {
-  let obj = {}
-  for(let el of arr) {
-    // @ts-ignore
-    obj[el[key]] = el
-  }
-  return obj
-}

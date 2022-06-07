@@ -96,6 +96,7 @@ async function subscribeToAdoptionsStatusChanged () {
         const {id, status} = JSON.parse(message.value)
         const adoption = dbGet(id)
         adoption.status = status
+        console.log(`Updating ${adoption.id} to status ${status}`)
 
         // Save to DB
         dbPut(id, adoption)
@@ -151,14 +152,17 @@ app.post('/api/adoptions', (req, res) => {
 })
 
 app.patch('/api/adoptions/:id', (req, res) => {
-  const adoptions = dbGet(req.params.id)
+  const adoption = dbGet(req.params.id)
   const { status } = req.body
-  if(!adoptions)
-    res.status(400).json({
+  if(!adoption) {
+    console.log('Cannot find adoption ${req.params.id} to patch')
+    return res.status(400).json({
       message: 'Adoption not found, cannot patch.'
     })
+  }
 
   const updatedAdoption = {...adoption, status }
+  console.log(`Patching ${JSON.stringify(updatedAdoption)}`)
 
   producer.send({
     topic: 'adoptions.statusChanged',

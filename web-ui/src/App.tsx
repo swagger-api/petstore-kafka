@@ -81,6 +81,7 @@ function App() {
       </div>
 
       <div>
+      <WebsocketConsole location={location} />
       </div>
 
     </div>

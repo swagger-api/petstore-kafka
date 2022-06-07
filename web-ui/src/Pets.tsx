@@ -41,10 +41,10 @@ export default function Pets() {
     fetchPets({ location })
   }, [location])
 
-  const addAdoption = useAdoptionsStore(s => s.addAdoption)
+  const _requestAdoption = useAdoptionsStore(s => s.requestAdoptions)
   const requestAdoption = () => {
     deselectAll()
-    addAdoption(Array.from(selectedRows))
+    _requestAdoption({ pets: Array.from(selectedRows), location })
   }
 
   const [name, setName] = useState(randomName())
