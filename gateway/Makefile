@@ -16,4 +16,7 @@ help: ## Prints help for targets with comments
 run: $(CADDYFILE)
 	$(CADDY_CLI) run $(CADDYFILE)
 
+dev: $(CADDYFILE)
+	$(CADDY_CLI) run -watch $(CADDYFILE)
+
 .PHONY: run

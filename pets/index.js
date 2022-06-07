@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { dbOpen, dbPut, dbGet, dbGetAll, dbQuery } = require('../lib').db
+const { dbOpen, dbPut, dbGet, dbGetAll, dbGetMeta, dbPutMeta, dbQuery } = require('../lib').db
 
 // Configs
 const BROKERS = process.env.BROKERS || ['localhost:9092']
@@ -15,7 +15,7 @@ const CLIENT_ID = 'pets'
 
 // ---------------------------------------------------------------
 // DB Sink
-dbOpen('./pets.db')
+dbOpen(path.resolve(__dirname, './pets.db'))
 
 // ---------------------------------------------------------------
 // Kafka
@@ -54,7 +54,7 @@ async function subscribeToPetsAdded () {
 
         // Save to DB
         dbPut(pet.id, pet)
-        dbPut(`${consumerGroup}.offset`, message.offset + 1)
+        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
 
         // Produce: pets.statusChanged
@@ -67,8 +67,8 @@ async function subscribeToPetsAdded () {
         })
       },
     })
-    const dbOffset = dbGet(`${consumerGroup}.offset`) || -1
-    if(dbOffset < 0) {
+    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    if(typeof dbOffset === 'number') {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
     } else {
@@ -96,12 +96,12 @@ async function subscribeToPetsStatusChanged () {
         // Save to DB with new status
         const pet = dbGet(id)
         dbPut(id, {...pet, status})
-        dbPut(`${consumerGroup}.offset`, message.offset + 1)
+        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
       },
     })
-    const dbOffset = dbGet(`${consumerGroup}.offset`) || -1
-    if(dbOffset < 0) {
+    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    if(typeof dbOffset === 'number') {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
     } else {

@@ -18,7 +18,7 @@ GET http://localhost:3100/api/pets?location=office
 POST http://localhost:3100/api/pets
 Content-Type: application/json
 
-{"name": "Frcicky", "location": "Office"}
+{"name": "Fido", "location": "test"}
 
 # Pets - Change status
 PATCH http://localhost:3100/api/pets/994e1d3d-9243-4636-8286-bac667b3fdbb

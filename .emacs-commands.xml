@@ -16,6 +16,8 @@
     <arg name="TOPIC">
       <value> pets.added </value>
       <value> pets.statusChanged </value>
+      <value> adoptions.requested </value>
+      <value> adoptions.statusChanged </value>
       <value> __consumer_offsets </value>
 
     </arg>
@@ -84,11 +86,26 @@
 
   </command>
 
+  <command title="Start Adoptions" dir="./adoptions" >
+
+    <cmd>
+      nix-shell --run "yarn run dev"
+    </cmd>
+
+  </command>
 
   <command title="Start Websocket" dir="./websocket" >
 
     <cmd>
       nix-shell --run "yarn run dev"
+    </cmd>
+
+  </command>
+
+  <command title="Start Gateway" dir="./gateway" >
+
+    <cmd>
+      nix-shell --run "make dev"
     </cmd>
 
   </command>

@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { dbOpen, dbPut, dbGet, dbGetAll, dbQuery } = require('../lib').db
+const { dbOpen, dbPut,dbPutMeta, dbGetMeta, dbGet, dbGetAll, dbQuery } = require('../lib').db
 
 // Configs
 const BROKERS = process.env.BROKERS || ['localhost:9092']
@@ -15,7 +15,7 @@ const CLIENT_ID = 'adoptions'
 
 // ---------------------------------------------------------------
 // DB Sink
-dbOpen('./adoptions.db')
+dbOpen(path.resolve(__dirname, './adoptions.db'))
 
 // ---------------------------------------------------------------
 // Kafka
@@ -33,42 +33,90 @@ const consumers = []
 const producer = kafka.producer()
 producer.connect()
 
-
 // Consume kafka
-// async function subscribeToAdoptionsRequested () {
-//   const consumerGroup = 'pets-statusChanged-sink'
-//   try {
-//     const consumer = kafka.consumer({ groupId: consumerGroup})
-//     await consumer.connect()
-//     consumers.push(consumer)
-//     await consumer.subscribe({ topic: 'pets.statusChanged', fromBeginning: true })
-//     await consumer.run({
-//       autoCommit: false,
-//       eachMessage: async ({ topic, partition, message }) => {
-//         const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-//         console.log(`- ${prefix} ${message.key}#${message.value}`)
-//         const {id, status} = JSON.parse(message.value)
+async function subscribeToAdoptionsAdded () {
+  const consumerGroup = 'adoptions-requested-sink'
+  const listenTopic = 'adoptions.requested'
+  try {
+    const consumer = kafka.consumer({ groupId: consumerGroup})
+    await consumer.connect()
+    consumers.push(consumer)
+    await consumer.subscribe({ topic: listenTopic, fromBeginning: true })
+    await consumer.run({
+      autoCommit: false,
+      eachMessage: async ({ topic, partition, message }) => {
+        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+        console.log(`- ${prefix} ${message.key}#${message.value}`)
+        const adoption = JSON.parse(message.value)
 
-//         // Save to DB with new status
-//         const pet = dbGet(id)
-//         dbPut(id, {...pet, status})
-//         dbPut(`${consumerGroup}.offset`, message.offset + 1)
-//         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
-//       },
-//     })
-//     const dbOffset = dbGet(`${consumerGroup}.offset`) || -1
-//     if(dbOffset < 0) {
-//       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
-//       await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
-//     } else {
-//       console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
-//     }
-//   } catch(e) {
-//     console.error(`[${consumerGroup}] ${e.message}`, e)   
-//   }
-// }
+        // Initial status of PENDING
+        adoption.status = 'pending' // This status doesn't trigger an event. It should live for a very short time.
 
-// subscribeToPetsStatusChanged()
+        // Save to DB
+        dbPut(adoption.id, adoption)
+        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
+        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
+
+        // Produce: adoptions.statusChanged
+        producer.send({
+          topic: 'adoptions.statusChanged',
+          messages: [
+            { value: JSON.stringify({...adoption, status: 'requested'}) },
+          ],
+        })
+      },
+    })
+    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    if(typeof dbOffset === 'number') {
+      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
+      await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
+    } else {
+      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
+    }
+  } catch(e) {
+    console.error(`[${consumerGroup}] ${e.message}`, e)   
+  }
+}
+
+
+async function subscribeToAdoptionsStatusChanged () {
+  const consumerGroup = 'adoptions-statusChanged-sink'
+  const listenTopic = 'adoptions.statusChanged'
+  try {
+    const consumer = kafka.consumer({ groupId: consumerGroup})
+    await consumer.connect()
+    consumers.push(consumer)
+    await consumer.subscribe({ topic: listenTopic, fromBeginning: true })
+    await consumer.run({
+      autoCommit: false,
+      eachMessage: async ({ topic, partition, message }) => {
+        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+        console.log(`- ${prefix} ${message.key}#${message.value}`)
+
+        const {id, status} = JSON.parse(message.value)
+        const adoption = dbGet(id)
+        adoption.status = status
+
+        // Save to DB
+        dbPut(id, adoption)
+        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
+        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
+      },
+    })
+    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    if(typeof dbOffset === 'number') {
+      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
+      await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
+    } else {
+      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
+    }
+  } catch(e) {
+    console.error(`[${consumerGroup}] ${e.message}`, e)   
+  }
+}
+
+subscribeToAdoptionsAdded()
+subscribeToAdoptionsStatusChanged()
 
 
 // ---------------------------------------------------------------
@@ -90,8 +138,10 @@ app.post('/api/adoptions', (req, res) => {
   const adoption = req.body
   adoption.id = adoption.id || uuid.v4()
 
+  // TODO: Some validation of the body
+
   producer.send({
-    topic: 'pets.added',
+    topic: 'adoptions.requested',
     messages: [
       { value: JSON.stringify(adoption) },
     ],
