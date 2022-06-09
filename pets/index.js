@@ -34,7 +34,6 @@ const consumers = []
 const producer = kafka.producer()
 producer.connect()
 
-
 // Consume kafka
 async function subscribeToPetsAdded () {
   const consumerGroup = 'pets-added-sink'

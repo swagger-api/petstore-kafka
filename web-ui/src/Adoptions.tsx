@@ -35,7 +35,9 @@ export default function Adoptions() {
           </div>
           {a.reasons?.length ? (
             <div className="bg-red-50 border-red-600 border text-red-600 p-3 mt-4" >
-              Error: Something bad happened
+              {a.reasons.map(reason => (
+                <div> {reason} </div>
+              ))}
             </div>
           ) : null}
           <div className='flex justify-end mt-2'>

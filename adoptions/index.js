@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { FlatDB } = require('../lib')
+const { FlatDB, KafkaCache } = require('../lib')
 
 // Configs
 const BROKERS = process.env.BROKERS || ['localhost:9092']
@@ -34,6 +34,25 @@ const consumers = []
 const producer = kafka.producer()
 producer.connect()
 
+
+const petCache = new KafkaCache({
+  kafka,
+  name: 'adoptions-pet-status-cache',
+  topics: ['pets.statusChanged'],
+  onCache: (old, log) => {
+    console.log("log", log)
+
+    console.log("log.status", log.status)
+
+
+    if(!log.status) {
+      return old
+    }
+    console.log(`Cacheing pet status to disk: ${log.id} - ${log.status}`)
+    return {status: log.status}
+  }
+})
+
 // Consume kafka
 async function subscribeToAdoptionsAdded () {
   const consumerGroup = 'adoptions-requested-sink'
@@ -42,7 +61,7 @@ async function subscribeToAdoptionsAdded () {
     const consumer = kafka.consumer({ groupId: consumerGroup})
     await consumer.connect()
     consumers.push(consumer)
-    await consumer.subscribe({ topic: listenTopic, fromBeginning: true })
+    await consumer.subscribe({ topic: listenTopic, fromBeginning: false })
     await consumer.run({
       autoCommit: false,
       eachMessage: async ({ topic, partition, message }) => {
@@ -96,10 +115,28 @@ async function processStatusChange(adoption, status) {
     // update adoption status
 
     // Hold all pets
+    const reasons = adoption.pets
+          .map(petId => ({ id: petId, status: petCache.get(petId).status}))
+          .filter(({status}) => status !== 'available')
+          .map(({id, status}) => `Pet ${id} is not available, it is ${status}`)
+
+    // Denied
+    if(reasons.length) {
+      db.dbMerge(adoption.id, {reasons})
+      await producer.send({
+        topic: 'adoptions.statusChanged',
+        messages: [
+          { value: JSON.stringify({id: adoption.id, status: 'denied', reasons}) },
+        ],
+      })
+      // End - Denied
+      return 
+    }
+
+    // Available
     const petMessages = adoption.pets.map(petId => ({
         value: JSON.stringify({id: petId, status: 'onhold'}),
     }))
-    console.log("petMessages", petMessages)
 
     await producer.send({
       topic: 'pets.statusChanged',
@@ -113,19 +150,25 @@ async function processStatusChange(adoption, status) {
       ],
     })
 
+    // End - Available
     return
   }
 
-  // if(status === 'denied') {
-  //   return Promise.all(adoptions.pets.map(petId => {
-  //     return producer.send({
-  //       topic: 'pets.statusChanged',
-  //       messages: [
-  //         { value: JSON.stringify({id: petId, status: 'available'}) },
-  //       ],
-  //     })
-  //   }))
-  // }
+  // Adopted -> Claim all the Pets
+  if(status === 'adopted') {
+    // TODO
+    return 
+  }
+
+
+  if(status === 'denied') {
+    // Only if previous state was "available", can we release the Pets from onhold.
+    // If this was triggered by us, because a pet was _already_ onhold, then we cannot release it.
+    // Possible solution: Add the holder onto the pet object, and let Pet service release the pets.
+    // TODO
+    return 
+  }
+
 
 }
 
@@ -136,7 +179,7 @@ async function subscribeToAdoptionsStatusChanged () {
     const consumer = kafka.consumer({ groupId: consumerGroup})
     await consumer.connect()
     consumers.push(consumer)
-    await consumer.subscribe({ topic: listenTopic, fromBeginning: true })
+    await consumer.subscribe({ topic: listenTopic, fromBeginning: false })
     await consumer.run({
       autoCommit: false,
       eachMessage: async ({ topic, partition, message }) => {
@@ -152,7 +195,7 @@ async function subscribeToAdoptionsStatusChanged () {
         await processStatusChange(adoption, status)
 
         const newAdoption = {...adoption, status}
-        console.log(`Updating ${newAdoption.id} to status ${newAdoption.status}`)
+        // console.log(`Updating ${newAdoption.id} to status ${newAdoption.status}`)
         // Save to DB
         db.dbPut(id, newAdoption)
         db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
