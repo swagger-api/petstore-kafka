@@ -6,7 +6,15 @@ interface Pet {
   id: string;
   name: string;
   location?: string;
-  status: 'available' | 'onhold' | 'adopted';
+  status: 'pending' | 'available' | 'onhold' | 'adopted';
+}
+
+function newPet(pet: Partial<Pet>): Pet {
+  return Object.assign({
+    id: '',
+    name: '',
+    status: 'pending'
+  }, pet)
 }
 
 export class PetsAPI {
@@ -63,12 +71,17 @@ const useStore = create<{
 }))
 
 // WebSocket connection
-onMessage((json: any) => {
+onMessage('pets.store', (json: any) => {
   if(json.type === 'kafka' && json.topic.startsWith('pets.')) {
     const pet: Pet = json.log
+    const id = pet.id
     useStore.setState(state => {
+      const oldPet = (state.pets[id])
       return {
-        pets: {...state.pets, [pet.id]: pet }
+        pets: {
+          ...state.pets,
+          [id]: {...oldPet, ...pet}
+        }
       }
     })
   }

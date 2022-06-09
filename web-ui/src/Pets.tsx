@@ -32,7 +32,6 @@ export default function Pets() {
   const addPet = usePetStore(s => s.addPet)
   const pets = usePetStore(s => s.pets)
   const location = getQuery('location')
-
   const rows = Object.values(pets) || []
   rows.reverse()
   const [selectedRows, toggleRow, deselectAll] = useSelected()

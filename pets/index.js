@@ -16,6 +16,7 @@ const CLIENT_ID = 'pets'
 // ---------------------------------------------------------------
 // DB Sink
 dbOpen(path.resolve(__dirname, './pets.db'))
+console.log('DB _meta: ' +  JSON.stringify(dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
 // Kafka
@@ -68,7 +69,7 @@ async function subscribeToPetsAdded () {
       },
     })
     const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
-    if(typeof dbOffset === 'number') {
+    if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
     } else {
@@ -101,7 +102,7 @@ async function subscribeToPetsStatusChanged () {
       },
     })
     const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
-    if(typeof dbOffset === 'number') {
+    if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
     } else {

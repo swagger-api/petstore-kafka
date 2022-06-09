@@ -9,6 +9,12 @@ interface Adoption {
   reasons?: [];
 }
 
+const baseAdoption: Adoption = {
+  id: '',
+  status: 'requested',
+  pets: [],
+}
+
 export class AdoptionsAPI {
   url: string = '';
 
@@ -63,12 +69,18 @@ const useStore = create<{
 }))
 
 // WebSocket connection
-onMessage((json: any, websocket: WebSocket) => {
+onMessage('adoptions.store', (json: any, websocket: WebSocket) => {
   if(json.type === 'kafka' && json.topic.startsWith('adoptions.')) {
-    const adoption: Adoption = json.log
     useStore.setState(state => {
+      const adoption: Adoption = json.log
+      const oldAdoption = state.adoptions[adoption.id] || {}
+      const newAdoption = {...baseAdoption, ...oldAdoption, ...adoption}
+
       return {
-        adoptions: {...state.adoptions, [adoption.id]: adoption }
+        adoptions: {
+          ...state.adoptions,
+          [adoption.id]: newAdoption,
+        }
       }
     })
   }

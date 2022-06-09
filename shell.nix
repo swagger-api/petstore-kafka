@@ -3,6 +3,8 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     docker-compose
+    tmuxinator
+    tmux
     apacheKafka
 
     bashInteractive

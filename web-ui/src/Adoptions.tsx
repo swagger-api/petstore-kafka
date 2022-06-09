@@ -20,7 +20,7 @@ export default function Adoptions() {
   const pets = usePetsStore(s => s.pets)
 
   return (
-    <div>
+    <div className="max-h-[600px] overflow-y-scroll" >
       {adoptions.map(a => (
         <div key={a.id} className="mt-2 border-gray-400 border p-4 rounded-md" >
           <h2>
@@ -30,7 +30,7 @@ export default function Adoptions() {
 
           <div className="py-3 space-y-1" >
             {a.pets.map(id => (
-              <div key={id} className="border-gray-400 text-gray-600 border rounded-md ml-1 p-1.5 font-bold" > {pets[id].name} </div>
+              <div key={id} className="border-gray-400 text-gray-600 border rounded-md ml-1 p-1.5 font-bold" > {(pets[id] || {}).name} </div>
             ))}
           </div>
           {a.reasons?.length ? (

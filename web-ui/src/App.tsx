@@ -6,7 +6,7 @@ import { Button } from './UI'
 import {setQuery, getQuery} from './query'
 import WebsocketConsole from './WebsocketConsole'
 import usePetsStore from './pets.store'
-import {connect as wsConnect} from './websocket'
+import {connect as wsConnect, onMessage } from './websocket'
 
 const newTab = () => {
   window.open(window.location.href, '_blank')
@@ -16,6 +16,7 @@ function App() {
   const location = getQuery('location')
   const adoptions = Object.values(useAdoptionsStore(s => s.adoptions))
   const [locationInput, setLocationInput] = useState(location)
+  const [websocketMsgCount, setWebsocketMsgCount] = useState(0)
 
   useEffect(() => {
     if (!location) {
@@ -23,6 +24,10 @@ function App() {
       setQuery('location', 'Plett')
       return 
     }
+
+    onMessage('app', () => {
+      setWebsocketMsgCount(s => s+1)
+    })
 
     return wsConnect({
       location,
@@ -47,7 +52,10 @@ function App() {
       </div>
 
       <div className="p-8" >
-        <h2 className="text-2xl" >Adoptions </h2>
+        <h2 className="text-2xl" > The game </h2>
+        <p>
+        WebSocket messages: {websocketMsgCount}
+        </p>
         <p>
           {!pets.length ? (
             <span> No pets. Go rescue some pets!</span>

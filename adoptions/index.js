@@ -16,6 +16,7 @@ const CLIENT_ID = 'adoptions'
 // ---------------------------------------------------------------
 // DB Sink
 dbOpen(path.resolve(__dirname, './adoptions.db'))
+console.log('DB _meta: ' +  JSON.stringify(dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
 // Kafka
@@ -61,13 +62,13 @@ async function subscribeToAdoptionsAdded () {
         producer.send({
           topic: 'adoptions.statusChanged',
           messages: [
-            { value: JSON.stringify({...adoption, status: 'requested'}) },
+            { value: JSON.stringify({id: adoption.id, status: 'requested'}) },
           ],
         })
       },
     })
     const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
-    if(typeof dbOffset === 'number') {
+    if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
     } else {
@@ -78,6 +79,55 @@ async function subscribeToAdoptionsAdded () {
   }
 }
 
+// Trigger other events based on status change. And update the status 
+// requested -> denied | available
+// available -> denied | adopted
+// adopted -> END
+// denied -> END
+async function processStatusChange(adoption, status) {
+  console.log("processing status: ", status)
+
+
+  // requested -> denied | available
+  if(status === 'requested') {
+    
+    // available
+    // for each pets, hold them
+    // update adoption status
+
+    // Hold all pets
+    const petMessages = adoption.pets.map(petId => ({
+        value: JSON.stringify({id: petId, status: 'onhold'}),
+    }))
+    console.log("petMessages", petMessages)
+
+    await producer.send({
+      topic: 'pets.statusChanged',
+      messages: petMessages
+    })
+
+    await producer.send({
+      topic: 'adoptions.statusChanged',
+      messages: [
+        { value: JSON.stringify({id: adoption.id, status: 'available'}) },
+      ],
+    })
+
+    return
+  }
+
+  // if(status === 'denied') {
+  //   return Promise.all(adoptions.pets.map(petId => {
+  //     return producer.send({
+  //       topic: 'pets.statusChanged',
+  //       messages: [
+  //         { value: JSON.stringify({id: petId, status: 'available'}) },
+  //       ],
+  //     })
+  //   }))
+  // }
+
+}
 
 async function subscribeToAdoptionsStatusChanged () {
   const consumerGroup = 'adoptions-statusChanged-sink'
@@ -95,17 +145,22 @@ async function subscribeToAdoptionsStatusChanged () {
 
         const {id, status} = JSON.parse(message.value)
         const adoption = dbGet(id)
-        adoption.status = status
-        console.log(`Updating ${adoption.id} to status ${status}`)
+        if(!adoption)
+          throw new Error(`Did not find Adoption with id ${id}`)
 
+        // Business logic
+        await processStatusChange(adoption, status)
+
+        const newAdoption = {...adoption, status}
+        console.log(`Updating ${newAdoption.id} to status ${newAdoption.status}`)
         // Save to DB
-        dbPut(id, adoption)
+        dbPut(id, newAdoption)
         dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
       },
     })
     const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
-    if(typeof dbOffset === 'number') {
+    if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
     } else {
@@ -115,6 +170,7 @@ async function subscribeToAdoptionsStatusChanged () {
     console.error(`[${consumerGroup}] ${e.message}`, e)   
   }
 }
+
 
 subscribeToAdoptionsAdded()
 subscribeToAdoptionsStatusChanged()

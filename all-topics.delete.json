@@ -1,0 +1,25 @@
+{
+  "partitions": [
+    {
+      "topic": "pets.added",
+      "partition": 0,
+      "offset": -1
+    },
+    {
+      "topic": "pets.statusChanged",
+      "partition": 0,
+      "offset": -1
+    },
+    {
+      "topic": "adoptions.requested",
+      "partition": 0,
+      "offset": -1
+    },
+    {
+      "topic": "adoptions.statusChanged",
+      "partition": 0,
+      "offset": -1
+    }
+  ],
+  "version": 1
+}

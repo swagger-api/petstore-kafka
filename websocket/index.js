@@ -1,16 +1,17 @@
 require('dotenv').config() // Will load .env into process.env
 const WebSocket = require('ws');
 const { Kafka, logLevel } = require('kafkajs')
+const {dbOpen, dbPut, dbGet, dbPutMeta, dbGetMeta} = require('../lib').db
+const { KafkaCache } = require('../lib')
 
 const PORT = process.env.NODE_PORT || 3300
 const BROKERS = process.env.BROKERS || ['localhost:9092']
-const CLIENT_ID = 'pets'
+const CLIENT_ID = 'websocket'
 
 // Global state
 let sockets = []
 const socketsForLocation = {}
 let consumer, producer
-
 
 // ---------------------------------------------------------------
 // Kafka
@@ -20,34 +21,55 @@ const kafka = new Kafka({
   clientId: CLIENT_ID,
 })
 
-consumers = []
+const allTopics = [
+  'pets.added',
+  'pets.statusChanged',
+  'adoptions.requested',
+  'adoptions.statusChanged',
+]
+
+
 producer = kafka.producer()
 producer.connect().then(console.log, console.error)
 
-subscribeToAll()
-async function subscribeToAll () {
-  const consumerGroup = 'websocket' // Add random suffix to make each instance unique??
+const cache = new KafkaCache({
+  kafka,
+  name: 'websocket-location-cache',
+  topics: ['pets.added', 'adoptions.requested'],
+  onCache: (old, log) => {
+    if(!log.location) {
+      return old
+    }
+    console.log(`Cacheing to disk: ${log.id} - ${log.location}`)
+    return {location: log.location}
+  }
+})
+
+subscribeToNew()
+
+async function subscribeToNew () {
+  const consumerGroup = 'websocket-new' // Add random suffix to make each instance unique??
   try {
 	  const consumer = kafka.consumer({ groupId: consumerGroup})
 	  await consumer.connect()
-	  consumers.push(consumer)
-	  await consumer.subscribe({ topics: [/pets.*/, /adoptions.*/], fromBeginning: false })
+	  await consumer.subscribe({ topics: allTopics, fromBeginning: false }) 
 	  await consumer.run({
+      autoCommit: false,
 	    eachMessage: async ({ topic, partition, message }) => {
+        console.log('websocket-new')
 		    const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-		    console.log(`- ${prefix} ${message.key}#${message.value}`)
-
-        const log = JSON.parse(message.value)
-        const { location } = log
+        const log = JSON.parse(message.value.toString())
+        const { location } = cache.get(log.id)
         if(!location) {
           console.error(`E - Missing location field - ${prefix}`)
           return
-        }
-        
-        eachSocketInLocation(location, (socket) => {
+        } 
+        console.log(`Broadcasting ${location} - ${topic}`)
+        eachSocketInLocation(location.toLowerCase(), (socket) => {
+          console.log("socket", socket)
+
           socket.send(JSON.stringify({ type: 'kafka', topic, log }))
         })
-
 	    },
 	  })
   } catch(e) {

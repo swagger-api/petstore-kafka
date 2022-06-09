@@ -44,15 +44,23 @@ export function connect({ location, url }: { location: string; url: string}): ()
   return disconnect
 }
 
-export function onMessage(cb: (json: any, websocket: WebSocket) => void) {
-  ee.addListener('message', function (msg: any) {
+const idToListener: {
+  [key: string]: (...args: any[]) => void;
+} = {}
+export function onMessage(id: string, cb: (json: any, websocket: WebSocket) => void) {
+  if(idToListener[id]) {
+    ee.removeListener('message', idToListener[id])
+  }
+
+  idToListener[id] = function (msg: any) {
     try {
       if(websocket)
         cb(JSON.parse(msg.data), websocket)
     } catch(e) {
       console.error(e)
     }
-  })
+  }
+  ee.addListener('message', idToListener[id])
 }
 
 export function onError(cb: (websocket: WebSocket) => void) {
