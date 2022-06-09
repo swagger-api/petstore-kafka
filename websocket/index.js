@@ -55,19 +55,14 @@ async function subscribeToNew () {
 	  await consumer.subscribe({ topics: allTopics, fromBeginning: false }) 
 	  await consumer.run({
       autoCommit: false,
-	    eachMessage: async ({ topic, partition, message }) => {
-        console.log('websocket-new')
-		    const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+      eachMessage: async ({ topic, partition, message }) => {
         const log = JSON.parse(message.value.toString())
-        const { location } = cache.get(log.id)
+        const location = cache.get(log.id, {}).location || log.location
         if(!location) {
-          console.error(`E - Missing location field - ${prefix}`)
-          return
-        } 
-        console.log(`Broadcasting ${location} - ${topic}`)
+          console.error(`Log doesnt have location or cached location ${JSON.stringify(log)} ${topic}`)
+          return 
+        }
         eachSocketInLocation(location.toLowerCase(), (socket) => {
-          console.log("socket", socket)
-
           socket.send(JSON.stringify({ type: 'kafka', topic, log }))
         })
 	    },
@@ -76,7 +71,6 @@ async function subscribeToNew () {
 	  console.error(`[${consumerGroup}] ${e.message}`, e)   
   }
 }
-
 
 // ---------------------------------------------------------------
 // Websocket server
@@ -126,5 +120,9 @@ ws.on('connection', (socket) => {
 
 function eachSocketInLocation(location, cb) {
   const sockets = socketsForLocation[location.toLowerCase()] || []
+  if(!sockets.length) {
+    return 
+  }
+  console.log(`Broadcasting for ${location}`)
   sockets.forEach(cb)
 }

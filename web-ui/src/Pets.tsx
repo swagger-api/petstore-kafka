@@ -59,11 +59,11 @@ export default function Pets() {
 
           <div className="overflow-hidden border-b sm:rounded-lg">
             <div className="flex justify-between mt-1">
-              <div className="flex justify-end ml-4" >
+              <div className="flex justify-end ml-4 items-center" >
                 <input className="px-5 py-1 border rounded-md" value={name} onChange={(e: any) => { setName(e.target.value) }} type="text" />
                 <Button onClick={onAdd} className="ml-2 flex items-center" > <PlusIcon className="h-6 mr-2" /> Add Rescue</Button>
               </div>
-              <div className="flex justify-end" >
+              <div className="" >
                 <Button onClick={requestAdoption} disabled={!selectedRows.size} color='orange' size='xs' className="ml-2 flex items-center" > <UploadIcon className="h-6 mr-2" /> Adopt selected pets</Button>
               </div>
             </div>

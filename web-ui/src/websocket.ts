@@ -23,23 +23,12 @@ export function connect({ location, url }: { location: string; url: string}): ()
 
   websocket = new WebSocket(url)
   websocket.addEventListener('open', function(...args: any[]) {
-    // @ts-ignore
-    const that: any = this
-    this.send(JSON.stringify({ location }))
-    console.log("websocket this", that, args)
+    this.send(JSON.stringify({ type: 'handshake.request', location }))
   })
 
   websocket.addEventListener('message', function(event: MessageEvent) {
-    // @ts-ignore
-    console.log('websocket.message')
     ee.emit('message', event)
   })
-
-  // onOpen(() => {
-  //   // Handshake
-  //   if(websocket)
-  //     websocket.send(JSON.stringify({ type: 'handshake.request', location }))
-  // })
 
   return disconnect
 }

@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { dbOpen, dbPut,dbPutMeta, dbGetMeta, dbGet, dbGetAll, dbQuery } = require('../lib').db
+const { FlatDB } = require('../lib')
 
 // Configs
 const BROKERS = process.env.BROKERS || ['localhost:9092']
@@ -15,8 +15,8 @@ const CLIENT_ID = 'adoptions'
 
 // ---------------------------------------------------------------
 // DB Sink
-dbOpen(path.resolve(__dirname, './adoptions.db'))
-console.log('DB _meta: ' +  JSON.stringify(dbGetMeta(), null, 2))
+const db = new FlatDB(path.resolve(__dirname, './adoptions.db'))
+console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
 // Kafka
@@ -54,8 +54,8 @@ async function subscribeToAdoptionsAdded () {
         adoption.status = 'pending' // This status doesn't trigger an event. It should live for a very short time.
 
         // Save to DB
-        dbPut(adoption.id, adoption)
-        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
+        db.dbPut(adoption.id, adoption)
+        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
 
         // Produce: adoptions.statusChanged
@@ -67,7 +67,7 @@ async function subscribeToAdoptionsAdded () {
         })
       },
     })
-    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
     if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
@@ -144,7 +144,7 @@ async function subscribeToAdoptionsStatusChanged () {
         console.log(`- ${prefix} ${message.key}#${message.value}`)
 
         const {id, status} = JSON.parse(message.value)
-        const adoption = dbGet(id)
+        const adoption = db.dbGet(id)
         if(!adoption)
           throw new Error(`Did not find Adoption with id ${id}`)
 
@@ -154,12 +154,12 @@ async function subscribeToAdoptionsStatusChanged () {
         const newAdoption = {...adoption, status}
         console.log(`Updating ${newAdoption.id} to status ${newAdoption.status}`)
         // Save to DB
-        dbPut(id, newAdoption)
-        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
+        db.dbPut(id, newAdoption)
+        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
       },
     })
-    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
     if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
@@ -185,10 +185,10 @@ app.use(bodyParser.json())
 app.get('/api/adoptions', (req, res) => {
   const { location, status } = req.query
   if(!location && !status) {
-    return res.json(dbGetAll())
+    return res.json(db.dbGetAll())
   }
 
-  return res.json(dbQuery({ location, status }, { caseInsensitive: true }))
+  return res.json(db.dbQuery({ location, status }, { caseInsensitive: true }))
 })
 
 app.post('/api/adoptions', (req, res) => {
@@ -208,7 +208,7 @@ app.post('/api/adoptions', (req, res) => {
 })
 
 app.patch('/api/adoptions/:id', (req, res) => {
-  const adoption = dbGet(req.params.id)
+  const adoption = db.dbGet(req.params.id)
   const { status } = req.body
   if(!adoption) {
     console.log('Cannot find adoption ${req.params.id} to patch')

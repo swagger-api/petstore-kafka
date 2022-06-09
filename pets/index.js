@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { dbOpen, dbPut, dbGet, dbGetAll, dbGetMeta, dbPutMeta, dbQuery } = require('../lib').db
+const { FlatDB } = require('../lib')
 
 // Configs
 const BROKERS = process.env.BROKERS || ['localhost:9092']
@@ -15,8 +15,8 @@ const CLIENT_ID = 'pets'
 
 // ---------------------------------------------------------------
 // DB Sink
-dbOpen(path.resolve(__dirname, './pets.db'))
-console.log('DB _meta: ' +  JSON.stringify(dbGetMeta(), null, 2))
+const db = new FlatDB(path.resolve(__dirname, './pets.db'))
+console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
 // Kafka
@@ -54,8 +54,8 @@ async function subscribeToPetsAdded () {
         pet.status = 'pending' // This status doesn't trigger an event. It should live for a very short time.
 
         // Save to DB
-        dbPut(pet.id, pet)
-        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
+        db.dbPut(pet.id, pet)
+        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
 
         // Produce: pets.statusChanged
@@ -68,7 +68,7 @@ async function subscribeToPetsAdded () {
         })
       },
     })
-    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
     if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
@@ -95,13 +95,13 @@ async function subscribeToPetsStatusChanged () {
         const {id, status} = JSON.parse(message.value)
 
         // Save to DB with new status
-        const pet = dbGet(id)
-        dbPut(id, {...pet, status})
-        dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
+        const pet = db.dbGet(id)
+        db.dbPut(id, {...pet, status})
+        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
         consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
       },
     })
-    const dbOffset = dbGetMeta(`${consumerGroup}.offset`)
+    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
     if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
       await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
@@ -126,10 +126,10 @@ app.use(bodyParser.json())
 app.get('/api/pets', (req, res) => {
   const { location, status } = req.query
   if(!location && !status) {
-    return res.json(dbGetAll())
+    return res.json(db.dbGetAll())
   }
 
-  return res.json(dbQuery({ location, status }, { caseInsensitive: true }))
+  return res.json(db.dbQuery({ location, status }, { caseInsensitive: true }))
 })
 
 app.post('/api/pets', (req, res) => {
@@ -147,7 +147,7 @@ app.post('/api/pets', (req, res) => {
 })
 
 app.patch('/api/pets/:id', (req, res) => {
-  const pet = dbGet(req.params.id)
+  const pet = db.dbGet(req.params.id)
   const { status } = req.body
   if(!pet)
     res.status(400).json({
