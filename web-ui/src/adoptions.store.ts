@@ -2,11 +2,15 @@ import create from 'zustand'
 import { onMessage } from './websocket'
 import {arrayToObject} from './utils'
 
+interface AdoptionReason {
+  petId: string;
+  message: string;
+}
 interface Adoption {
   id: string;
-  status: 'requested' | 'pending' | 'denied' | 'approved';
+  status: 'requested' | 'pending' | 'available' | 'denied' | 'approved';
   pets: string[];
-  reasons?: [];
+  reasons?: AdoptionReason[];
 }
 
 const baseAdoption: Adoption = {
@@ -28,6 +32,16 @@ export class AdoptionsAPI {
     })
   }
 
+  changeStatus = async ({status, id}: {status: string; id: string }) => {
+    return fetch(`${this.url}/adoptions/${id}`,{
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({status})
+    })
+  }
+
   requestAdoption = ({pets, location}: {pets: string[]; location: string;}) => {
     return fetch(`${this.url}/adoptions`, {
       method: 'POST',
@@ -37,6 +51,7 @@ export class AdoptionsAPI {
       body: JSON.stringify({ pets, location }),
     })
   }
+
 }
 
 const api = new AdoptionsAPI('/api')
@@ -47,12 +62,21 @@ const useStore = create<{
   };
   requestAdoptions({pets,location}: {pets: string[]; location: string;}): void;
   fetchAdoptions({location}: {location: string;}): void;
+  changeStatus({status, id}: {id: string; status: string;}): void;
 }>((set) => ({
   adoptions: {},
   fetchAdoptions: async ({ location }) => {
     try {
       const adoptions = await api.getAdoptions(location)
       set(() => ({ adoptions: arrayToObject(adoptions, 'id') }))
+    } catch (e) {
+      console.error(e)
+      // TODO
+    }
+  },
+  changeStatus: async ({ id, status }) => {
+    try {
+      const adoptions = await api.changeStatus({status, id})
     } catch (e) {
       console.error(e)
       // TODO

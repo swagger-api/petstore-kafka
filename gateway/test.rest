@@ -34,10 +34,19 @@ content-type: application/json
 {"pets": ["a", "b"], "location": "test"}
 
 # Adoptions - Get location=Plett
+GET http://localhost:4000/api/adoptions?status=denied
+
+# Adoptions - Get location=Plett and not denied
 GET http://localhost:4000/api/adoptions?location=Plett
 
 # Adoptions - Change status
 PATCH http://localhost:4000/api/adoptions/a1760fb5-ad6b-4794-9aa0-1c60fdf3e226
+content-type: application/json
+
+{"status": "approved"}
+
+# Adoptions - Deny/Approve
+PATCH http://localhost:4000/api/adoptions/78a5bf3c-fe4d-4901-89a7-754d24695c59
 content-type: application/json
 
 {"status": "approved"}

@@ -1,7 +1,10 @@
 http://localhost:4000 {
 	# Pets service
 	reverse_proxy /api/pets 127.0.0.1:3100
+	reverse_proxy /api/pets/* 127.0.0.1:3100
+
 	# Adoptions service
+	reverse_proxy /api/adoptions/* 127.0.0.1:3200
 	reverse_proxy /api/adoptions 127.0.0.1:3200
 
 	# Websocket

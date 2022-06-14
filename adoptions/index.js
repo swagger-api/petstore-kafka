@@ -40,11 +40,6 @@ const petCache = new KafkaCache({
   name: 'adoptions-pet-status-cache',
   topics: ['pets.statusChanged'],
   onCache: (old, log) => {
-    console.log("log", log)
-
-    console.log("log.status", log.status)
-
-
     if(!log.status) {
       return old
     }
@@ -99,15 +94,14 @@ async function subscribeToAdoptionsAdded () {
 }
 
 // Trigger other events based on status change. And update the status 
-// requested -> denied | available
+// requested -> rejected | available
 // available -> denied | adopted
 // adopted -> END
+// rejected -> END
 // denied -> END
 async function processStatusChange(adoption, status) {
-  console.log("processing status: ", status)
 
-
-  // requested -> denied | available
+  // requested -> rejected | available
   if(status === 'requested') {
     
     // available
@@ -118,7 +112,7 @@ async function processStatusChange(adoption, status) {
     const reasons = adoption.pets
           .map(petId => ({ id: petId, status: petCache.get(petId).status}))
           .filter(({status}) => status !== 'available')
-          .map(({id, status}) => `Pet ${id} is not available, it is ${status}`)
+          .map(({id, status}) => ({petId: id, message: `${status}`}))
 
     // Denied
     if(reasons.length) {
@@ -126,10 +120,10 @@ async function processStatusChange(adoption, status) {
       await producer.send({
         topic: 'adoptions.statusChanged',
         messages: [
-          { value: JSON.stringify({id: adoption.id, status: 'denied', reasons}) },
+          { value: JSON.stringify({id: adoption.id, status: 'rejected', reasons}) },
         ],
       })
-      // End - Denied
+      // End - Rejected
       return 
     }
 
@@ -155,17 +149,37 @@ async function processStatusChange(adoption, status) {
   }
 
   // Adopted -> Claim all the Pets
-  if(status === 'adopted') {
-    // TODO
+  if(status === 'approved') {
+    const claimPetMessages = adoption.pets
+          .map(petId => ({
+            value: JSON.stringify({
+              id: petId,
+              status: 'adopted'
+            })
+          }))
+
+    await producer.send({
+      topic: 'pets.statusChanged',
+      messages: claimPetMessages
+    })
+
     return 
   }
 
-
   if(status === 'denied') {
-    // Only if previous state was "available", can we release the Pets from onhold.
-    // If this was triggered by us, because a pet was _already_ onhold, then we cannot release it.
-    // Possible solution: Add the holder onto the pet object, and let Pet service release the pets.
-    // TODO
+    const claimPetMessages = adoption.pets
+          .map(petId => ({
+            value: JSON.stringify({
+              id: petId,
+              status: 'available'
+            })
+          }))
+
+    await producer.send({
+      topic: 'pets.statusChanged',
+      messages: claimPetMessages
+    })
+
     return 
   }
 
@@ -194,12 +208,8 @@ async function subscribeToAdoptionsStatusChanged () {
         // Business logic
         await processStatusChange(adoption, status)
 
-        const newAdoption = {...adoption, status}
-        // console.log(`Updating ${newAdoption.id} to status ${newAdoption.status}`)
-        // Save to DB
-        db.dbPut(id, newAdoption)
+        db.dbMerge(id, {status})
         db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
-        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
       },
     })
     const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
@@ -226,12 +236,13 @@ app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/api/adoptions', (req, res) => {
-  const { location, status } = req.query
+  const { location='', status='' } = req.query
   if(!location && !status) {
     return res.json(db.dbGetAll())
   }
 
-  return res.json(db.dbQuery({ location, status }, { caseInsensitive: true }))
+  let results = db.dbQuery({ location, status }, { caseInsensitive: true })
+  return res.json(results)
 })
 
 app.post('/api/adoptions', (req, res) => {
@@ -270,7 +281,7 @@ app.patch('/api/adoptions/:id', (req, res) => {
     ],
   })
 
-  res.status(200).send(updatedAdoption)
+  return res.status(200).send(updatedAdoption)
 })
 
 // // SPA

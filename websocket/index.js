@@ -1,7 +1,6 @@
 require('dotenv').config() // Will load .env into process.env
 const WebSocket = require('ws');
 const { Kafka, logLevel } = require('kafkajs')
-const {dbOpen, dbPut, dbGet, dbPutMeta, dbGetMeta} = require('../lib').db
 const { KafkaCache } = require('../lib')
 
 const PORT = process.env.NODE_PORT || 3300

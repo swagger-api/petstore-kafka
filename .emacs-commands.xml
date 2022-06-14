@@ -109,4 +109,13 @@
 
   </command>
 
+
+  <command title="Stop tmuxinator"  >
+
+    <cmd>
+      nix-shell --run "./stop.sh"
+    </cmd>
+
+  </command>
+
 </emacs>
