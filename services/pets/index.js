@@ -10,7 +10,7 @@ const { Kafka, logLevel } = require('kafkajs')
 const { FlatDB } = require('../lib')
 
 // Configs
-const KAFKA_HOST = process.env.KAFKA_HOST || 'localhost:9092'
+const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
 const CLIENT_ID = 'pets'
 
 // ---------------------------------------------------------------
@@ -20,11 +20,9 @@ console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
 // Kafka
-
-console.log('Connected to kafka on: ' + KAFKA_HOST)
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
-  brokers: KAFKA_HOST,
+  brokers: KAFKA_HOSTS,
   clientId: CLIENT_ID,
   retry: {
     initialRetryTime: 1000,

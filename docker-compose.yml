@@ -2,7 +2,6 @@ version: "2"
 
 services:
 
-
   web-ui:
     image: petstore-kafka/web-ui:latest
     restart: always

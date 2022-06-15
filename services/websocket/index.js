@@ -4,7 +4,7 @@ const { Kafka, logLevel } = require('kafkajs')
 const { KafkaCache } = require('../lib')
 
 const PORT = process.env.NODE_PORT || 3300
-const BROKERS = process.env.BROKERS || 'localhost:9092'
+const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
 const CLIENT_ID = 'websocket'
 
 // Global state
@@ -16,7 +16,7 @@ let consumer, producer
 // Kafka
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
-  brokers: [BROKERS],
+  brokers: KAFKA_HOSTS,
   clientId: CLIENT_ID,
 })
 

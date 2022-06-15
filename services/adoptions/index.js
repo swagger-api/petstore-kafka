@@ -10,7 +10,7 @@ const { Kafka, logLevel } = require('kafkajs')
 const { FlatDB, KafkaCache } = require('../lib')
 
 // Configs
-const BROKERS = process.env.BROKERS || ['localhost:9092']
+const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
 const CLIENT_ID = 'adoptions'
 
 // ---------------------------------------------------------------
@@ -22,7 +22,7 @@ console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 // Kafka
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
-  brokers: BROKERS,
+  brokers: KAFKA_HOSTS,
   clientId: CLIENT_ID,
   retry: {
     initialRetryTime: 1000,

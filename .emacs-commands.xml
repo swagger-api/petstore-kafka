@@ -62,7 +62,7 @@
       nix-shell --run "kafka-delete-records.sh --bootstrap-server localhost:9092 --offset-json-file $TOPIC_FILE"
     </cmd>
 
-    <arg name="TOPIC_FILE" file-from="*.delete.json">
+    <arg name="TOPIC_FILE" file-from="services/kafka/*.delete.json">
     </arg>
 
   </command>
