@@ -7,17 +7,12 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { FlatDB, KafkaSink } = require('../lib')
+const { KafkaSink } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
 const DATA_BASEPATH = process.env.DATA_BASEPATH || __dirname
 const CLIENT_ID = 'adoptions'
-
-// ---------------------------------------------------------------
-// DB Sink
-const db = new FlatDB(path.resolve(DATA_BASEPATH, './adoptions.db'))
-console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
 // Kafka
@@ -36,6 +31,7 @@ const producer = kafka.producer()
 producer.connect()
 
 
+// Consume kafka
 const petCache = new KafkaSink({
   kafka,
   basePath: DATA_BASEPATH,
@@ -50,50 +46,44 @@ const petCache = new KafkaSink({
   }
 })
 
-// Consume kafka
-async function subscribeToAdoptionsAdded () {
-  const consumerGroup = 'adoptions-requested-sink'
-  const listenTopic = 'adoptions.requested'
-  try {
-    const consumer = kafka.consumer({ groupId: consumerGroup})
-    await consumer.connect()
-    consumers.push(consumer)
-    await consumer.subscribe({ topic: listenTopic, fromBeginning: true })
-    await consumer.run({
-      autoCommit: false,
-      eachMessage: async ({ topic, partition, message }) => {
-        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-        console.log(`- ${prefix} ${message.key}#${message.value}`)
-        const adoption = JSON.parse(message.value)
+const adoptionsCache = new KafkaSink({
+  kafka,
+  basePath: DATA_BASEPATH,
+  name: 'adoptions-adoptions-requested',
+  topics: ['adoptions.requested', 'adoptions.statusChanged'],
+  onLog: async ({log, sink, topic}) => {
 
-        // Initial status of PENDING
-        adoption.status = 'pending' // This status doesn't trigger an event. It should live for a very short time.
+    if(topic === 'adoptions.requested') {
+      // Save to DB
+      console.log(`Adding adoption - ${log.id} - pets = ${JSON.stringify(log.pets)}`)
+      sink.db.dbPut(log.id, {...log, status: 'pending'})
 
-        // Save to DB
-        db.dbPut(adoption.id, adoption)
-        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
-        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
-
-        // Produce: adoptions.statusChanged
-        producer.send({
-          topic: 'adoptions.statusChanged',
-          messages: [
-            { value: JSON.stringify({id: adoption.id, status: 'requested'}) },
-          ],
-        })
-      },
-    })
-    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
-    if(dbOffset) {
-      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
-      await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
-    } else {
-      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
+      // Produce: adoptions.statusChanged
+      producer.send({
+        topic: 'adoptions.statusChanged',
+        messages: [
+          { value: JSON.stringify({id: log.id,  status: 'requested'}) },
+        ],
+      })
+      return
     }
-  } catch(e) {
-    console.error(`[${consumerGroup}] ${e.message}`, e)   
+
+    if(topic === 'adoptions.statusChanged') {
+      const adoption = sink.db.dbGet(log.id)
+      if(!adoption)
+        throw new Error(`Did not find Adoption with id ${log.id}`)
+
+      // Business logic
+      console.log(`Processing status change - ${log.id} - ${log.status}`)
+      await processStatusChange(adoption, log.status)
+
+      console.log(`Saving status - ${log.id} - ${log.status}`)
+      sink.db.dbMerge(log.id, {status: log.status})
+      return
+    }
+
   }
-}
+})
 
 // Trigger other events based on status change. And update the status 
 // requested -> rejected | available
@@ -118,7 +108,7 @@ async function processStatusChange(adoption, status) {
 
     // Denied
     if(reasons.length) {
-      db.dbMerge(adoption.id, {reasons})
+      adoptionsCache.db.dbMerge(adoption.id, {reasons})
       await producer.send({
         topic: 'adoptions.statusChanged',
         messages: [
@@ -188,62 +178,19 @@ async function processStatusChange(adoption, status) {
 
 }
 
-async function subscribeToAdoptionsStatusChanged () {
-  const consumerGroup = 'adoptions-statusChanged-sink'
-  const listenTopic = 'adoptions.statusChanged'
-  try {
-    const consumer = kafka.consumer({ groupId: consumerGroup})
-    await consumer.connect()
-    consumers.push(consumer)
-    await consumer.subscribe({ topic: listenTopic, fromBeginning: false })
-    await consumer.run({
-      autoCommit: false,
-      eachMessage: async ({ topic, partition, message }) => {
-        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-        console.log(`- ${prefix} ${message.key}#${message.value}`)
-
-        const {id, status} = JSON.parse(message.value)
-        const adoption = db.dbGet(id)
-        if(!adoption)
-          throw new Error(`Did not find Adoption with id ${id}`)
-
-        // Business logic
-        await processStatusChange(adoption, status)
-
-        db.dbMerge(id, {status})
-        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
-      },
-    })
-    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
-    if(dbOffset) {
-      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
-      await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset - 1 }) // Double process the first log.
-    } else {
-      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
-    }
-  } catch(e) {
-    console.error(`[${consumerGroup}] ${e.message}`, e)   
-  }
-}
-
-
-subscribeToAdoptionsAdded()
-subscribeToAdoptionsStatusChanged()
-
-
 // ---------------------------------------------------------------
 // Rest
-app.use(morgan('combined'))
+app.use(morgan('short'))
 app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/api/adoptions', (req, res) => {
   const { location='', status='' } = req.query
   if(!location && !status) {
-    return res.json(db.dbGetAll())
+    return res.json(adoptionsCache.db.dbGetAll())
   }
 
-  let results = db.dbQuery({ location, status }, { caseInsensitive: true })
+  let results = adoptionsCache.db.dbQuery({ location, status }, { caseInsensitive: true })
   return res.json(results)
 })
 
@@ -264,7 +211,7 @@ app.post('/api/adoptions', (req, res) => {
 })
 
 app.patch('/api/adoptions/:id', (req, res) => {
-  const adoption = db.dbGet(req.params.id)
+  const adoption = adoptionsCache.db.dbGet(req.params.id)
   const { status } = req.body
   if(!adoption) {
     console.log('Cannot find adoption ${req.params.id} to patch')
