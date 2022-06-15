@@ -45,12 +45,12 @@ windows:
   - servers:
       layout: even-vertical
       panes:
-      - pets: make start-pets
-      - adoptions: make start-adoptions
-      - websocket: make start-websocket
+      - pets: make dev-pets
+      - adoptions: make dev-adoptions
+      - websocket: make dev-websocket
   - infra:
       layout: even-vertical
       panes:
-        - kafka: make start-kafka
-        - gateway: make start-gateway
-        - web-ui: make start-web-ui
+        - kafka: make dev-kafka
+        - gateway: make dev-gateway
+        - web-ui: make dev-web-ui

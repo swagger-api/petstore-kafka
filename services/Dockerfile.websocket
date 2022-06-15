@@ -1,0 +1,18 @@
+FROM node:16-alpine 
+
+RUN mkdir -p /srv
+WORKDIR /srv
+
+# Install before copying over source. Speeds up docker builds
+COPY websocket/package.json /srv/
+COPY websocket/yarn.lock /srv/
+RUN yarn 
+
+# Files
+COPY lib /lib
+COPY websocket /srv
+
+# Runtime
+ENV NODE_PORT=81
+EXPOSE 81
+CMD node index.js

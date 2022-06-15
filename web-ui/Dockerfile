@@ -10,4 +10,5 @@ COPY Caddyfile /etc/caddy/Caddyfile
 RUN mkdir -p /srv
 COPY --from=static-site /build/build /srv/build
 WORKDIR /srv
-EXPOSE 4000
+ENV CADDY_PORT=80
+EXPOSE 80

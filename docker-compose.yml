@@ -16,19 +16,19 @@ services:
     image: petstore-kafka/pets:latest
     restart: always
     environment:
-      KAFKA_HOST: "http://kafka"
+      KAFKA_HOSTS: "kafka:9092"
 
   adoptions:
     image: petstore-kafka/adoptions:latest
     restart: always
     environment:
-      KAFKA_HOST: "http://kafka"
+      KAFKA_HOSTS: "kafka:9092"
 
   websocket:
     image: petstore-kafka/websocket:latest
     restart: always
     environment:
-      KAFKA_HOST: "http://kafka"
+      KAFKA_HOSTS: "kafka:9092"
 
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.8

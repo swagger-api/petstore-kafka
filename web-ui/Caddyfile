@@ -1,4 +1,4 @@
-:4000 {
+:{$CADDY_PORT} {
   @pets path /api/pets /api/pets/* 
   @adoptions path /api/adoptions /api/adoptions/* 
   @websocket path /websocket

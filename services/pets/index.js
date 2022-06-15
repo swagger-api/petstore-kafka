@@ -20,6 +20,7 @@ console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
 // Kafka
+console.log('Connecting to Kafka on: ' + JSON.stringify(KAFKA_HOSTS))
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
   brokers: KAFKA_HOSTS,

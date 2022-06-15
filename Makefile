@@ -15,25 +15,40 @@ help: ## Prints help for targets with comments
 		sort | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-start-kafka: ## Runs just the Kafka services (kafka, zookeeper and CMAK)
-	cd ./services/kafka && $(RUN) "docker-compose up"
+dev-kafka: ## Runs just the Kafka services (kafka, zookeeper and CMAK)
+	$(RUN) "cd ./services/kafka && docker-compose up"
 
-start-pets: ## Runs the Pets service
-	cd ./services/pets && $(RUN) "yarn run dev"
+dev-pets: ## Runs the Pets service
+	$(RUN) "cd ./services/pets && yarn run dev"
 
-start-adoptions: ## Runs the Adoptions service
-	cd ./services/adoptions && $(RUN) "yarn run dev"
+dev-adoptions: ## Runs the Adoptions service
+	$(RUN) "cd ./services/adoptions && yarn run dev"
 
-start-websocket: ## Runs the Websocket service
-	cd ./services/websocket && $(RUN) "yarn run dev"
+dev-websocket: ## Runs the Websocket service
+	$(RUN) "cd ./services/websocket && yarn run dev"
 
-start-gateway: ## Runs a gateway, proxying to other services and used by web-ui
-	cd ./web-ui && $(RUN) "caddy run --envfile ./dev.env"
+dev-gateway: ## Runs a gateway, proxying to other services and used by web-ui
+	$(RUN) "cd ./web-ui && caddy run --envfile ./dev.env"
 
-start-web-ui: ## Runs a creat-react-app
-	cd ./web-ui && $(RUN) "yarn start"
+dev-web-ui: ## Runs a creat-react-app
+	$(RUN) "cd ./web-ui && yarn start"
 
 dev:
 	$(RUN) "tmuxinator start"
+
+build-pets:
+	$(RUN) "cd ./services && docker build -f Dockerfile.pets -t petstore-kafka/pets:latest ."
+
+build-adoptions:
+	$(RUN) "cd ./services && docker build -f Dockerfile.adoptions -t petstore-kafka/adoptions:latest ."
+
+build-websocket:
+	$(RUN) "cd ./services && docker build -f Dockerfile.websocket -t petstore-kafka/websocket:latest ."
+
+build-web-ui:
+	$(RUN) "cd ./web-ui && docker build -f Dockerfile -t petstore-kafka/web-ui:latest ."
+
+build: build-pets build-adoptions build-websocket build-web-ui
+
 
 .PHONY: tmuxinator
