@@ -1,7 +1,7 @@
 require('dotenv').config() // Will load .env into process.env
 const WebSocket = require('ws');
 const { Kafka, logLevel } = require('kafkajs')
-const { KafkaSink } = require('../lib')
+const { KafkaSink, KafkaLogger } = require('../lib')
 
 const PORT = process.env.NODE_PORT || 3300
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
@@ -17,6 +17,7 @@ let consumer, producer
 // Kafka
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
+  logCreator: KafkaLogger,
   brokers: KAFKA_HOSTS,
   clientId: CLIENT_ID,
 })

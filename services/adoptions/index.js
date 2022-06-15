@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { KafkaSink } = require('../lib')
+const { KafkaSink, KafkaLogger } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
@@ -18,6 +18,7 @@ const CLIENT_ID = 'adoptions'
 // Kafka
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
+  logCreator: KafkaLogger,
   brokers: KAFKA_HOSTS,
   clientId: CLIENT_ID,
   retry: {

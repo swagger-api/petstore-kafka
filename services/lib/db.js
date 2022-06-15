@@ -4,7 +4,11 @@ const path = require('path')
 class FlatDb {
   constructor(file) {
     this.db = FlatFile.sync(file)
-    this.db.on('open', () => console.log(`DB: ${file} opened`))
+    this.db.on('open', () => this.log(`${file} opened`))
+  }
+
+  log(...msgs) {
+    console.log(`[DB][I] ${new Date()} - ${msgs.join(' - ')}`)
   }
 
   dbPut(key, value) {
@@ -14,20 +18,17 @@ class FlatDb {
 
   // All keys, except the _meta key.
   dbGetAll(withMeta=false) {
-    // console.log(`DB: Fetching all records ${withMeta ? 'including' : 'without' } the _meta key.`)
     let keys = this.db.keys()
     keys = withMeta ? keys : keys.filter(a => a !== '_meta') 
     return keys.map(key => this.db.get(key))  
   } 
 
   dbGet(key) {
-    // console.log(`DB: Fetching ${key}`)
     return this.db.get(key)
   } 
 
   // {location: 'plett'} will filter all objects that have obj.location === 'plett'
   dbQuery(query, { caseInsensitive } = {} ) {
-    // console.log(`DB: Fetching all records for ${Object.keys(query)}`)
     return this.dbGetAll().filter(value => hasValues(value, query, { caseInsensitive }))
   } 
 
@@ -44,7 +45,6 @@ class FlatDb {
 
   // Meta to keep it outside of other commands
   dbGetMeta (key) {
-    // console.log(`DB: Fetching _meta${key ? '.' + key : ''}`)
     let _meta = this.db.get('_meta') || {}
 
     // Heal from non-object value stored
@@ -53,7 +53,6 @@ class FlatDb {
   } 
 
   dbPutMeta (key, value) {
-    // console.log(`DB: Updating _meta${key ? '.' + key : ''}`)
     let _meta = this.dbGetMeta() || {}
     if(key) {
       _meta[key] = value

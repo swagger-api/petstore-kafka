@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "flat-file-db": "^1.0.0"
+    "flat-file-db": "^1.0.0",
+    "kafkajs": "^2.0.2"
   }
 }

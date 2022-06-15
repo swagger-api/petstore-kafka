@@ -14,13 +14,14 @@ module.exports = class KafkaSink {
     this.topics = topics
     this.onLog = onLog || defaultOnLog // Persist it by default
     this.name = name
-    this.admin = kafka.admin()
+    this.admin = this.kafka.admin()
+    this.consumer = this.kafka.consumer({ groupId: this.name })
 
     this.db = new FlatDB(path.resolve(basePath, `./${name}.db`))
     this.subscribe()
   }
 
-  async processLog(consumer, { topic, partition, message })  {
+  async processLog({ topic, partition, message })  {
     const log = JSON.parse(message.value.toString())
     const id = this.makeIdFn(log)
     await this.onLog({
@@ -34,18 +35,18 @@ module.exports = class KafkaSink {
     this.db.dbPutMeta(`${topic}-partition-${partition}-offset`, message.offset + 1) 
   }
 
-  async seek({ consumer }) {
+  async seek() {
     return Promise.all(this.topics.map(async (topic) => {
       const offset = this.db.dbGetMeta(`${topic}-partition-0-offset`)
       if(offset) {
         this.info(`Cache exists, using ${offset} for ${topic}.partition-0`)
-        return consumer.seek({ topic, partition: 0, offset: +offset })
+        return this.consumer.seek({ topic, partition: 0, offset: +offset })
       } 
       this.info(`Cache does not exist for ${topic}.partition-0. Seeking to beginning...`)
       const partitions = await this.admin.fetchTopicOffsets(topic)
       const low = (partitions.find(p => p.partition === 0) || {low: 0}).low
       this.info(`Low is ${low}. Offsets for ${topic} are ${JSON.stringify(partitions)}`)
-      return consumer.seek({ topic, partition: 0, offset: +low })
+      return this.consumer.seek({ topic, partition: 0, offset: +low })
     }))
   }
 
@@ -54,30 +55,27 @@ module.exports = class KafkaSink {
     return typeof val === 'undefined' ? defaultValue : val
   }
 
-  info(msg='', extra) {
-    console.log(`${this.name} - ${msg}`, extra)
+  info(...msgs) {
+    this.consumer.logger().info(null, {extra: [this.name, ...msgs]})
   }
 
-  error(msg='', extra) {
-    console.error(`${this.name} - ${msg}`, extra)
+  error(...msgs) {
+    this.consumer.logger().error(null, {extra: [this.name, ...msgs]})
   }
 
   async subscribe() {
-    const consumerGroup = `${this.name}` // Make it random??
     try {
-      const consumer = this.kafka.consumer({ groupId: consumerGroup})
-      await consumer.connect()
-      await consumer.subscribe({ topics: this.topics, fromBeginning: false }) 
-      consumer.run({
+      await this.consumer.connect()
+      await this.consumer.subscribe({ topics: this.topics, fromBeginning: false }) 
+      this.consumer.run({
         autoCommit: false,
         eachMessage: async ({ topic, partition, message }) => {
-          await this.processLog(consumer, { topic, partition, message })
+          await this.processLog({ topic, partition, message })
         },
       }).then(() => this.info(`Consumer initialized`))
-      this.info('Consumer run')
-      await this.seek({ consumer })
+      await this.seek()
     } catch(e) {
-      this.error(`[${consumerGroup}] ${e.message}`, e)   
+      this.error(`${e.message}`, e)   
     }
   }
 }
