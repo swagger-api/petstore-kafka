@@ -15,11 +15,6 @@ const DATA_BASEPATH = process.env.DATA_BASEPATH || __dirname
 const CLIENT_ID = 'pets'
 
 // ---------------------------------------------------------------
-// DB Sink
-const db = new FlatDB(path.resolve(DATA_BASEPATH, './pets.db'))
-console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
-
-// ---------------------------------------------------------------
 // Kafka
 console.log('Connecting to Kafka on: ' + JSON.stringify(KAFKA_HOSTS))
 const kafka = new Kafka({
@@ -37,100 +32,48 @@ const producer = kafka.producer()
 producer.connect()
 
 // Consume kafka
-async function subscribeToPetsAdded () {
-  const consumerGroup = 'pets-added-sink'
-  try {
-    const consumer = kafka.consumer({ groupId: consumerGroup})
-    await consumer.connect()
-    consumers.push(consumer)
-    await consumer.subscribe({ topic: 'pets.added', fromBeginning: true })
-    await consumer.run({
-      autoCommit: false,
-      eachMessage: async ({ topic, partition, message }) => {
-        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-        console.log(`- ${prefix} ${message.key}#${message.value}`)
-        const pet = JSON.parse(message.value)
+const petsCache = new KafkaSink({
+  kafka,
+  basePath: DATA_BASEPATH,
+  name: 'pets-cache',
+  topics: ['pets.added', 'pets.statusChanged'],
+  onLog: ({log, topic, sink}) => {
 
-        // Initial status of PENDING
-        pet.status = 'pending' // This status doesn't trigger an event. It should live for a very short time.
+    if(topic === 'pets.added') {
+      console.log(`Adding pet to disk: ${log.id} - ${log.name}`)
+      sink.db.dbPut(log.id, {...log, status: 'pending'})
 
-        // Save to DB
-        db.dbPut(pet.id, pet)
-        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
-        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
-
-        // Produce: pets.statusChanged
-        // It's now available
-        producer.send({
-          topic: 'pets.statusChanged',
-          messages: [
-            { value: JSON.stringify({ ...pet, status: 'available'}) },
-          ],
-        })
-      },
-    })
-    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
-    if(dbOffset) {
-      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
-      await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
-    } else {
-      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
+      producer.send({
+        topic: 'pets.statusChanged',
+        messages: [
+          { value: JSON.stringify({ ...log, status: 'available'}) },
+        ],
+      })
+      return 
     }
-  } catch(e) {
-    console.error(`[${consumerGroup}] ${e.message}`, e)   
-  }
-}
 
-async function subscribeToPetsStatusChanged () {
-  const consumerGroup = 'pets-statusChanged-sink'
-  try {
-    const consumer = kafka.consumer({ groupId: consumerGroup})
-    await consumer.connect()
-    consumers.push(consumer)
-    await consumer.subscribe({ topic: 'pets.statusChanged', fromBeginning: true })
-    await consumer.run({
-      autoCommit: false,
-      eachMessage: async ({ topic, partition, message }) => {
-        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-        console.log(`- ${prefix} ${message.key}#${message.value}`)
-        const {id, status} = JSON.parse(message.value)
-
-        // Save to DB with new status
-        const pet = db.dbGet(id)
-        db.dbPut(id, {...pet, status})
-        db.dbPutMeta(`${consumerGroup}.offset`, message.offset + 1)
-        consumer.commitOffsets([{topic, partition, offset: message.offset + 1}])
-      },
-    })
-    const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
-    if(dbOffset) {
-      console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
-      await consumer.seek({ topic: 'pets.added', partition: 0, offset: dbOffset })
-    } else {
-      console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
+    if(topic === 'pets.statusChanged') {
+      console.log(`Updating pet status to disk: ${log.id} - ${log.status}`)
+      // Save to DB with new status
+      sink.db.dbMerge(log.id, {status: log.status})
+      return 
     }
-  } catch(e) {
-    console.error(`[${consumerGroup}] ${e.message}`, e)   
   }
-}
-
-subscribeToPetsAdded()
-subscribeToPetsStatusChanged()
-
+})
 
 // ---------------------------------------------------------------
 // Rest
-app.use(morgan('combined'))
+app.use(morgan('short'))
 app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/api/pets', (req, res) => {
   const { location, status } = req.query
   if(!location && !status) {
-    return res.json(db.dbGetAll())
+    return res.json(petsCache.db.dbGetAll())
   }
 
-  return res.json(db.dbQuery({ location, status }, { caseInsensitive: true }))
+  return res.json(petsCache.db.dbQuery({ location, status }, { caseInsensitive: true }))
 })
 
 app.post('/api/pets', (req, res) => {
@@ -148,7 +91,7 @@ app.post('/api/pets', (req, res) => {
 })
 
 app.patch('/api/pets/:id', (req, res) => {
-  const pet = db.dbGet(req.params.id)
+  const pet = petsCache.db.dbGet(req.params.id)
   const { status } = req.body
   if(!pet)
     res.status(400).json({
