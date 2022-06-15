@@ -4,7 +4,7 @@ const { Kafka, logLevel } = require('kafkajs')
 const { KafkaCache } = require('../lib')
 
 const PORT = process.env.NODE_PORT || 3300
-const BROKERS = process.env.BROKERS || ['localhost:9092']
+const BROKERS = process.env.BROKERS || 'localhost:9092'
 const CLIENT_ID = 'websocket'
 
 // Global state
@@ -16,7 +16,7 @@ let consumer, producer
 // Kafka
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
-  brokers: BROKERS,
+  brokers: [BROKERS],
   clientId: CLIENT_ID,
 })
 
@@ -74,7 +74,7 @@ async function subscribeToNew () {
 // ---------------------------------------------------------------
 // Websocket server
 const ws = new WebSocket.Server({
-  host: '0.0.0.0',
+  // host: '0.0.0.0',
   port: PORT,
 }, (a) => {
   const address = ws._server.address()

@@ -18,7 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "gateway": "caddy run --envfile dev.env",
+    "start": "REACT_APP_WEBSOCKET_HOST=ws://localhost:4000/websocket react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

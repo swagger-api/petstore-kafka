@@ -8,6 +8,13 @@ import WebsocketConsole from './WebsocketConsole'
 import usePetsStore from './pets.store'
 import {connect as wsConnect, onMessage } from './websocket'
 
+const CONFIGS = {
+  // Issues with websocket + cra proxy + caddy. Requires me to add this env variable to override it more naturally.
+  websocketUrl: process.env.REACT_APP_WEBSOCKET_HOST || relativeWebsocketUrl('/websocket'),
+  petsUrl: '/api',
+  adoptionsUrl: '/api',
+}
+
 const newTab = () => {
   window.open(window.location.href, '_blank')
 }
@@ -31,7 +38,7 @@ function App() {
 
     return wsConnect({
       location,
-      url: 'ws://0.0.0.0:3300'
+      url: CONFIGS.websocketUrl,
     })
 
   }, [])
@@ -89,7 +96,7 @@ function App() {
       </div>
 
       <div>
-      <WebsocketConsole location={location} />
+      <WebsocketConsole location={location} websocketUrl={CONFIGS.websocketUrl} />
       </div>
 
     </div>
@@ -97,3 +104,9 @@ function App() {
 }
 
 export default App;
+
+function relativeWebsocketUrl(path: string) {
+  let url = new URL(window.location.href)
+  let protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+  return `${protocol}//${url.host}${path}`
+}

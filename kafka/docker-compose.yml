@@ -1,36 +1,6 @@
 version: "2"
 
 services:
-
-
-  web-ui:
-    image: petstore-kafka/web-ui:latest
-    restart: always
-    ports:
-      - "4000:5000"
-    environment:
-      PETS_HOST: "http://pets"
-      ADOPTIONS_HOST: "http://adoptions"
-      WEBSOCKET_HOST: "http://websocket"
-
-  pets:
-    image: petstore-kafka/pets:latest
-    restart: always
-    environment:
-      KAFKA_HOST: "http://kafka"
-
-  adoptions:
-    image: petstore-kafka/adoptions:latest
-    restart: always
-    environment:
-      KAFKA_HOST: "http://kafka"
-
-  websocket:
-    image: petstore-kafka/websocket:latest
-    restart: always
-    environment:
-      KAFKA_HOST: "http://kafka"
-
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.8
     ports:
@@ -61,7 +31,6 @@ services:
       depends_on:
         - zookeeper
         - kafka
-    
 
 volumes:
   zookeeper_data:

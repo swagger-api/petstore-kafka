@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 
-export default function WebsocketConsole({ location }: { location: string; }) {
+export default function WebsocketConsole({ location, websocketUrl }: { location: string; websocketUrl: string }) {
   const [readyState, setReadyState] = useState('')
   const [logs, setLogs] = useState<string[]>([])
 
   useEffect(() => {
-    let websocket = new WebSocket('ws://0.0.0.0:3300')
+    let websocket = new WebSocket(websocketUrl)
     setReadyState('Connecting')
     websocket.addEventListener('message', (msg) => {
       const log = msg.data

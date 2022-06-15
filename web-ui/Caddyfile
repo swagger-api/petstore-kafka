@@ -1,0 +1,35 @@
+:4000 {
+  @pets path /api/pets /api/pets/* 
+  @adoptions path /api/adoptions /api/adoptions/* 
+  @websocket path /websocket
+
+  uri strip_suffix /
+  
+	# Pets service
+  handle @pets {
+    reverse_proxy {$PETS_HOST}
+  }
+
+  # Adoptions service
+  handle @adoptions {
+    reverse_proxy {$ADOPTIONS_HOST}
+  }
+
+  # Websocket
+  handle @websocket {
+    reverse_proxy {$WEBSOCKET_HOST}
+  }
+
+  # SPA
+  handle {
+    try_files {path} /
+    header /img/* Cache-Control max-age=31536000
+    header /js/* Cache-Control max-age=31536000
+    header /css/* Cache-Control max-age=31536000
+    header /fonts/* Cache-Control max-age=31536000
+    encode gzip
+    root * ./build
+    file_server
+  }
+
+}
