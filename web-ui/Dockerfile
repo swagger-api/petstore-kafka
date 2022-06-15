@@ -1,8 +1,15 @@
 FROM node:16-alpine as static-site
 
-COPY . /build
+# Install deps
+RUN mkdir -p /build
 WORKDIR /build
-RUN yarn && yarn run build
+COPY package.json /build/
+COPY yarn.lock /build/
+RUN yarn
+
+# Build the SPA
+COPY . /build
+RUN yarn run build
 
 FROM caddy:2-alpine
 

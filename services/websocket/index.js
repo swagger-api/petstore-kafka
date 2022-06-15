@@ -1,10 +1,11 @@
 require('dotenv').config() // Will load .env into process.env
 const WebSocket = require('ws');
 const { Kafka, logLevel } = require('kafkajs')
-const { KafkaCache } = require('../lib')
+const { KafkaSink } = require('../lib')
 
 const PORT = process.env.NODE_PORT || 3300
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
+const DATA_BASEPATH = process.env.DATA_BASEPATH || __dirname
 const CLIENT_ID = 'websocket'
 
 // Global state
@@ -31,22 +32,27 @@ const allTopics = [
 producer = kafka.producer()
 producer.connect().then(console.log, console.error)
 
-const cache = new KafkaCache({
+const locationCache = new KafkaSink({
   kafka,
+  basePath: DATA_BASEPATH,
   name: 'websocket-location-cache',
   topics: ['pets.added', 'adoptions.requested'],
-  onCache: (old, log) => {
+  onLog: ({log, sink}) => {
     if(!log.location) {
       return old
     }
-    console.log(`Cacheing to disk: ${log.id} - ${log.location}`)
-    return {location: log.location}
+    console.log(`Cacheing to location disk: ${log.id} - ${log.location}`)
+    return sink.db.dbPut(log.id, {location: log.location})
   }
 })
 
+let retryAttempts = 0
 subscribeToNew()
 
 async function subscribeToNew () {
+  if(retryAttempts > 9)
+    return
+  retryAttempts++
   const consumerGroup = 'websocket-new' // Add random suffix to make each instance unique??
   try {
 	  const consumer = kafka.consumer({ groupId: consumerGroup})
@@ -56,7 +62,7 @@ async function subscribeToNew () {
       autoCommit: false,
       eachMessage: async ({ topic, partition, message }) => {
         const log = JSON.parse(message.value.toString())
-        const location = cache.get(log.id, {}).location || log.location
+        const location = locationCache.get(log.id, {}).location || log.location
         if(!location) {
           console.error(`Log doesnt have location or cached location ${JSON.stringify(log)} ${topic}`)
           return 
@@ -67,6 +73,7 @@ async function subscribeToNew () {
 	    },
 	  })
   } catch(e) {
+    setTimeout(() => subscribeToNew(), 1500) // Try again
 	  console.error(`[${consumerGroup}] ${e.message}`, e)   
   }
 }

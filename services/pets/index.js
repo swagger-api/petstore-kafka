@@ -7,15 +7,16 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { FlatDB } = require('../lib')
+const { FlatDB, KafkaSink } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
+const DATA_BASEPATH = process.env.DATA_BASEPATH || __dirname
 const CLIENT_ID = 'pets'
 
 // ---------------------------------------------------------------
 // DB Sink
-const db = new FlatDB(path.resolve(__dirname, './pets.db'))
+const db = new FlatDB(path.resolve(DATA_BASEPATH, './pets.db'))
 console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------

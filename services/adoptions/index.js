@@ -7,15 +7,16 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { FlatDB, KafkaCache } = require('../lib')
+const { FlatDB, KafkaSink } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
+const DATA_BASEPATH = process.env.DATA_BASEPATH || __dirname
 const CLIENT_ID = 'adoptions'
 
 // ---------------------------------------------------------------
 // DB Sink
-const db = new FlatDB(path.resolve(__dirname, './adoptions.db'))
+const db = new FlatDB(path.resolve(DATA_BASEPATH, './adoptions.db'))
 console.log('DB _meta: ' +  JSON.stringify(db.dbGetMeta(), null, 2))
 
 // ---------------------------------------------------------------
@@ -35,16 +36,17 @@ const producer = kafka.producer()
 producer.connect()
 
 
-const petCache = new KafkaCache({
+const petCache = new KafkaSink({
   kafka,
+  basePath: DATA_BASEPATH,
   name: 'adoptions-pet-status-cache',
   topics: ['pets.statusChanged'],
-  onCache: (old, log) => {
+  onLog: ({log, sink}) => {
     if(!log.status) {
-      return old
+      return 
     }
     console.log(`Cacheing pet status to disk: ${log.id} - ${log.status}`)
-    return {status: log.status}
+    sink.db.dbPut(log.id, {status: log.status})
   }
 })
 
@@ -56,7 +58,7 @@ async function subscribeToAdoptionsAdded () {
     const consumer = kafka.consumer({ groupId: consumerGroup})
     await consumer.connect()
     consumers.push(consumer)
-    await consumer.subscribe({ topic: listenTopic, fromBeginning: false })
+    await consumer.subscribe({ topic: listenTopic, fromBeginning: true })
     await consumer.run({
       autoCommit: false,
       eachMessage: async ({ topic, partition, message }) => {
@@ -215,7 +217,7 @@ async function subscribeToAdoptionsStatusChanged () {
     const dbOffset = db.dbGetMeta(`${consumerGroup}.offset`)
     if(dbOffset) {
       console.log(`${consumerGroup} - Seeking to ${dbOffset}`)
-      await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset })
+      await consumer.seek({ topic: 'adoptions.requested', partition: 0, offset: dbOffset - 1 }) // Double process the first log.
     } else {
       console.log(`${consumerGroup} - Not Seeking, leaving default offset from Kafka`)
     }

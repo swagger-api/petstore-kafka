@@ -2,20 +2,18 @@
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    # Docker
-    docker
-    docker-compose
+    docker ## https://docs.docker.com/get-docker/
+    docker-compose ## https://docs.docker.com/compose/install/
 
     # Nodejs / web-ui
-    nodejs-16_x
-    yarn
-    caddy
+    nodejs-16_x ## https://nodejs.org/en/download/
+    yarn ## https://yarnpkg.com/getting-started/install
+    caddy ## https://caddyserver.com/docs/install
 
-    # Optional
-    tmuxinator
-    tmux
-    apacheKafka
-    bashInteractive
+    # Optional for dev
+    tmuxinator ## (optional) https://github.com/tmuxinator/tmuxinator
+    tmux ## (optional) https://github.com/tmux/tmux/wiki/Installing
+    apacheKafka ## (optional) https://kafka.apache.org/downloads
   ];
 
 }

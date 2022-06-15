@@ -1,2 +1,2 @@
 module.exports.FlatDB = require('./db')
-module.exports.KafkaCache = require('./kafka-cache.js')
+module.exports.KafkaSink = require('./kafka-sink.js')
