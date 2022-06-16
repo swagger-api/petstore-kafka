@@ -1,4 +1,4 @@
-const { FlatDB } = require('../lib')
+const { FlatDB } = require('./index')
 const path = require('path')
 
 const defaultOnLog = ({log, sink, id}) => {
@@ -75,7 +75,8 @@ module.exports = class KafkaSink {
       }).then(() => this.info(`Consumer initialized`))
       await this.seek()
     } catch(e) {
-      this.error(`${e.message}`, e)   
+      this.error(`${e.message}`, ['Retrying', e.stack])   
+      setTimeout(() => this.subscribe(), 1500) // retry
     }
   }
 }

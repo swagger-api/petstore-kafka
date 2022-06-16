@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { KafkaSink, KafkaLogger } = require('../lib')
+const { KafkaSink, KafkaLogger, KafkaStream } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
@@ -47,6 +47,7 @@ const petCache = new KafkaSink({
   }
 })
 
+
 const adoptionsCache = new KafkaSink({
   kafka,
   basePath: DATA_BASEPATH,
@@ -58,7 +59,28 @@ const adoptionsCache = new KafkaSink({
       // Save to DB
       console.log(`Adding adoption - ${log.id} - pets = ${JSON.stringify(log.pets)}`)
       sink.db.dbPut(log.id, {...log, status: 'pending'})
+    }
 
+    if(topic === 'adoptions.statusChanged') {
+      const adoption = sink.db.dbGet(log.id)
+      if(!adoption)
+        throw new Error(`Did not find Adoption with id ${log.id}`)
+
+      console.log(`Saving status - ${log.id} - ${log.status}`)
+      sink.db.dbMerge(log.id, {status: log.status})
+      return
+    }
+
+  }
+})
+
+new KafkaStream({
+  kafka,
+  topics: ['adoptions.requested', 'adoptions.statusChanged'],
+  name: 'adoptions-stream',
+  onLog: async ({ log, topic }) => {
+
+    if(topic === 'adoptions.requested') {
       // Produce: adoptions.statusChanged
       producer.send({
         topic: 'adoptions.statusChanged',
@@ -70,19 +92,13 @@ const adoptionsCache = new KafkaSink({
     }
 
     if(topic === 'adoptions.statusChanged') {
-      const adoption = sink.db.dbGet(log.id)
+      const adoption = adoptionsCache.db.dbGet(log.id)
       if(!adoption)
         throw new Error(`Did not find Adoption with id ${log.id}`)
-
-      // Business logic
       console.log(`Processing status change - ${log.id} - ${log.status}`)
       await processStatusChange(adoption, log.status)
-
-      console.log(`Saving status - ${log.id} - ${log.status}`)
-      sink.db.dbMerge(log.id, {status: log.status})
-      return
+      return 
     }
-
   }
 })
 

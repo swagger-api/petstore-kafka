@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { KafkaSink, KafkaLogger } = require('../lib')
+const { KafkaSink, KafkaLogger, KafkaStream } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
@@ -43,13 +43,6 @@ const petsCache = new KafkaSink({
     if(topic === 'pets.added') {
       console.log(`Adding pet to disk: ${log.id} - ${log.name}`)
       sink.db.dbPut(log.id, {...log, status: 'pending'})
-
-      producer.send({
-        topic: 'pets.statusChanged',
-        messages: [
-          { value: JSON.stringify({ ...log, status: 'available'}) },
-        ],
-      })
       return 
     }
 
@@ -59,6 +52,21 @@ const petsCache = new KafkaSink({
       sink.db.dbMerge(log.id, {status: log.status})
       return 
     }
+  }
+})
+
+new KafkaStream({
+  kafka,
+  name: 'pets-stream',
+  topics: ['pets.added'],
+  onLog: async ({ log }) => {
+    console.log(`Pet added, producing pets.statusChanged ${log.id} - available`)
+    producer.send({
+      topic: 'pets.statusChanged',
+      messages: [
+        { value: JSON.stringify({ ...log, status: 'available'}) },
+      ],
+    })
   }
 })
 

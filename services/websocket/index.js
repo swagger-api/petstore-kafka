@@ -11,7 +11,7 @@ const CLIENT_ID = 'websocket'
 // Global state
 let sockets = []
 const socketsForLocation = {}
-let consumer, producer
+let consumer
 
 // ---------------------------------------------------------------
 // Kafka
@@ -28,10 +28,6 @@ const allTopics = [
   'adoptions.requested',
   'adoptions.statusChanged',
 ]
-
-
-producer = kafka.producer()
-producer.connect().then(console.log, console.error)
 
 const locationCache = new KafkaSink({
   kafka,

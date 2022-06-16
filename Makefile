@@ -44,19 +44,19 @@ dev-kafka: ## Runs just the Kafka services (kafka, zookeeper and CMAK)
 	$(RUN) "cd ./services/kafka && docker-compose up"
 
 dev-pets: ## Runs the Pets service
-	$(RUN) "cd ./services/pets && yarn run dev"
+	$(RUN) "cd ./services/pets && yarn && yarn run dev"
 
 dev-adoptions: ## Runs the Adoptions service
-	$(RUN) "cd ./services/adoptions && yarn run dev"
+	$(RUN) "cd ./services/adoptions && yarn &&  yarn run dev"
 
 dev-websocket: ## Runs the Websocket service
-	$(RUN) "cd ./services/websocket && yarn run dev"
+	$(RUN) "cd ./services/websocket && yarn && yarn run dev"
 
 dev-gateway: ## Runs a gateway, proxying to other services and used by web-ui
 	$(RUN) "cd ./web-ui && caddy run --envfile ./dev.env"
 
 dev-web-ui: ## Runs a creat-react-app
-	$(RUN) "cd ./web-ui && yarn start"
+	$(RUN) "cd ./web-ui && yarn && yarn start"
 
 dev: ## Start a Tmuxinator project running all dev services
 	$(RUN) "tmuxinator start"
