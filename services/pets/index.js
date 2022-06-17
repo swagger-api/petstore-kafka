@@ -1,4 +1,3 @@
-require('dotenv').config() // Will load .env into process.env
 const express = require('express')
 const path = require('path')
 const cors = require('cors')
@@ -7,7 +6,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { KafkaSink, KafkaLogger, KafkaStream } = require('../lib')
+const { KafkaSink, KafkaLogger, KafkaStream, FlatDB: { queryObjToMatchQuery } } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
@@ -78,11 +77,13 @@ app.use(bodyParser.json())
 
 app.get('/api/pets', (req, res) => {
   const { location, status } = req.query
+
   if(!location && !status) {
     return res.json(petsCache.db.dbGetAll())
   }
 
-  return res.json(petsCache.db.dbQuery({ location, status }, { caseInsensitive: true }))
+  let query = queryObjToMatchQuery({ status, location })
+  return res.json(petsCache.db.dbQuery(query))
 })
 
 app.post('/api/pets', (req, res) => {

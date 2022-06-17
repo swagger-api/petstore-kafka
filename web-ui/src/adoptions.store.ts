@@ -26,8 +26,14 @@ export class AdoptionsAPI {
     this.url = url
   } 
 
-  getAdoptions = async (location: string) => {
-    return fetch(`${this.url}/adoptions?location=${location}`).then(res => res.json()).then((data) => {
+  getAdoptions = async ({ location, status }: { location: string; status: string; }) => {
+    let queries = new URLSearchParams();
+    if(location)
+      queries.set('location', location)
+    if(status)
+      queries.set('status', status)
+    
+    return fetch(`${this.url}/adoptions?${queries}`).then(res => res.json()).then((data) => {
       return data as Adoption[]
     })
   }
@@ -61,13 +67,13 @@ const useStore = create<{
     [key: string]: Adoption
   };
   requestAdoptions({pets,location}: {pets: string[]; location: string;}): void;
-  fetchAdoptions({location}: {location: string;}): void;
+  fetchAdoptions({location, status}: {location: string; status: string;}): void;
   changeStatus({status, id}: {id: string; status: string;}): void;
 }>((set) => ({
   adoptions: {},
-  fetchAdoptions: async ({ location }) => {
+  fetchAdoptions: async ({ location, status }) => {
     try {
-      const adoptions = await api.getAdoptions(location)
+      const adoptions = await api.getAdoptions({location, status})
       set(() => ({ adoptions: arrayToObject(adoptions, 'id') }))
     } catch (e) {
       console.error(e)

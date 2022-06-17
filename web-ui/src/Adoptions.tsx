@@ -14,7 +14,7 @@ export default function Adoptions() {
   const changeStatus = useAdoptionsStore(s => s.changeStatus)
 
   useEffect(() => {
-    fetchAdoptions({ location })
+    fetchAdoptions({ location, status: '!approved&!denied&!rejected'})
   }, [location])
 
   // Use local cache of pets to replace names.

@@ -37,7 +37,7 @@ export default function Pets() {
   const [selectedRows, toggleRow, deselectAll] = useSelected()
 
   useEffect(() => {
-    fetchPets({ location })
+    fetchPets({ location, status: '!adopted' })
   }, [location])
 
   const _requestAdoption = useAdoptionsStore(s => s.requestAdoptions)

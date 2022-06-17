@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const uuid = require('uuid')
 const morgan = require('morgan')
 const { Kafka, logLevel } = require('kafkajs')
-const { KafkaSink, KafkaLogger, KafkaStream } = require('../lib')
+const { KafkaSink, KafkaLogger, KafkaStream, FlatDB: { queryObjToMatchQuery } } = require('../lib')
 
 // Configs
 const KAFKA_HOSTS = (process.env.KAFKA_HOSTS || 'localhost:9092').split(',').map(s => s.trim())
@@ -63,8 +63,10 @@ const adoptionsCache = new KafkaSink({
 
     if(topic === 'adoptions.statusChanged') {
       const adoption = sink.db.dbGet(log.id)
-      if(!adoption)
-        throw new Error(`Did not find Adoption with id ${log.id}`)
+      if(!adoption) {
+        console.error(`Did not find Adoption with id ${log.id}`)
+        return
+      }
 
       console.log(`Saving status - ${log.id} - ${log.status}`)
       sink.db.dbMerge(log.id, {status: log.status})
@@ -93,8 +95,10 @@ new KafkaStream({
 
     if(topic === 'adoptions.statusChanged') {
       const adoption = adoptionsCache.db.dbGet(log.id)
-      if(!adoption)
-        throw new Error(`Did not find Adoption with id ${log.id}`)
+      if(!adoption) {
+        console.error(`Did not find Adoption with id ${log.id}`)
+        return
+      }
       console.log(`Processing status change - ${log.id} - ${log.status}`)
       await processStatusChange(adoption, log.status)
       return 
@@ -202,13 +206,14 @@ app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/api/adoptions', (req, res) => {
-  const { location='', status='' } = req.query
+  const { location, status } = req.query
+
   if(!location && !status) {
     return res.json(adoptionsCache.db.dbGetAll())
   }
 
-  let results = adoptionsCache.db.dbQuery({ location, status }, { caseInsensitive: true })
-  return res.json(results)
+  let query = queryObjToMatchQuery({ status, location })
+  return res.json(adoptionsCache.db.dbQuery(query))
 })
 
 app.post('/api/adoptions', (req, res) => {

@@ -24,8 +24,14 @@ export class PetsAPI {
     this.url = url
   } 
 
-  getPets = async (location: string) => {
-    return fetch(`${this.url}/pets?location=${location}`).then(res => res.json()).then((data) => {
+  getPets = async ({location,status}: {location?: string; status?: string;}) => {
+    let queries = new URLSearchParams();
+    if(location)
+      queries.set('location', location)
+    if(status)
+      queries.set('status', status)
+    
+    return fetch(`${this.url}/pets?${queries}`).then(res => res.json()).then((data) => {
       return data as Pet[]
     })
   }
@@ -49,7 +55,7 @@ const useStore = create<{
     [key:string]: Pet
   };
   addPet(newPet: {name: string; location: string;}): void;
-  fetchPets({location}: {location: string}): void;
+  fetchPets({location, status}: {location: string; status: string;}): void;
 }>((set) => ({
   pets: {},
   addPet: async ({ name, location }) => {
@@ -60,9 +66,9 @@ const useStore = create<{
       set(() => ({ petError: e+'' }))
     }
   },
-  fetchPets: async ({location}: {location: string}) => {
+  fetchPets: async ({location, status}) => {
     try {
-      const pets = await api.getPets(location)
+      const pets = await api.getPets({location, status})
       set(() => ({ petError: '', pets: arrayToObject(pets, 'id') }))
     } catch (e) {
       set(() => ({ petError: e+'' }))

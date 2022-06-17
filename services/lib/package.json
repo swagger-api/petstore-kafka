@@ -4,7 +4,15 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@types/jest": "^28.1.1",
     "flat-file-db": "^1.0.0",
     "kafkajs": "^2.0.2"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "jest": "^28.1.1"
   }
 }
