@@ -1,4 +1,3 @@
-require('dotenv').config() // Will load .env into process.env
 const WebSocket = require('ws');
 const { Kafka, logLevel } = require('kafkajs')
 const { KafkaSink, KafkaLogger } = require('../lib')

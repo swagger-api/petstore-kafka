@@ -5,7 +5,7 @@ services:
   # Main frontend
   # Expose port with `- {PORT}:80` (i.e., your port goes on the left).
   web-ui:
-    image: petstore-kafka/web-ui:latest
+    image: ponelat/petstore-kafka-web-ui:latest
     restart: always
     ports:
       - "80:80"
@@ -30,7 +30,7 @@ services:
 
   # Application Services
   pets:
-    image: petstore-kafka/pets:latest
+    image: ponelat/petstore-kafka-pets:latest
     restart: always
     environment:
       KAFKA_HOSTS: "kafka:9092"
@@ -39,7 +39,7 @@ services:
       - "pets_data:/data"
 
   adoptions:
-    image: petstore-kafka/adoptions:latest
+    image: ponelat/petstore-kafka-adoptions:latest
     restart: always
     environment:
       KAFKA_HOSTS: "kafka:9092"
@@ -48,7 +48,7 @@ services:
       - "adoptions_data:/data"
 
   websocket:
-    image: petstore-kafka/websocket:latest
+    image: ponelat/petstore-kafka-websocket:latest
     restart: always
     environment:
       KAFKA_HOSTS: "kafka:9092"

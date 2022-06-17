@@ -1,5 +1,6 @@
 NIX_RUN = nix-shell --run 
 BASH_RUN = bash -c 
+DOCKER_ORG = ponelat
 
 # Check if nix-shell exists, use that. Else use bash.
 # Nix is a package manager that will install all the packages needed,
@@ -55,25 +56,54 @@ dev-websocket: ## Runs the Websocket service
 dev-gateway: ## Runs a gateway, proxying to other services and used by web-ui
 	$(RUN) "cd ./web-ui && caddy run --envfile ./dev.env"
 
-dev-web-ui: ## Runs a creat-react-app
+dev-web-ui: ## Runs a create-react-app
 	$(RUN) "cd ./web-ui && yarn && yarn start"
 
 dev: ## Start a Tmuxinator project running all dev services
 	$(RUN) "tmuxinator start"
 
 build-pets: ## Build docker image for Pets service
-	$(RUN) "cd ./services && docker build -f Dockerfile.pets -t petstore-kafka/pets:latest ."
+	$(RUN) "cd ./services && docker build -f Dockerfile.pets -t $(DOCKER_ORG)/petstore-kafka-pets:latest ."
 
 build-adoptions: ## Build docker image for Adoptions service
-	$(RUN) "cd ./services && docker build -f Dockerfile.adoptions -t petstore-kafka/adoptions:latest ."
+	$(RUN) "cd ./services && docker build -f Dockerfile.adoptions -t $(DOCKER_ORG)/petstore-kafka-adoptions:latest ."
 
 build-websocket: ## Build docker image for Websocket service
-	$(RUN) "cd ./services && docker build -f Dockerfile.websocket -t petstore-kafka/websocket:latest ."
+	$(RUN) "cd ./services && docker build -f Dockerfile.websocket -t $(DOCKER_ORG)/petstore-kafka-websocket:latest ."
 
 build-web-ui: ## Build docker image for SPA (includes caddy gateway)
-	$(RUN) "cd ./web-ui && docker build -f Dockerfile -t petstore-kafka/web-ui:latest ."
+	$(RUN) "cd ./web-ui && docker build -f Dockerfile -t $(DOCKER_ORG)/petstore-kafka-web-ui:latest ."
 
 build: build-pets build-adoptions build-websocket build-web-ui ## Build all docker images
+
+clean-main: ## Clean the docker volumes used in `make start`
+	$(RUN) "docker-compose -f ./docker-compose.yml down -v"
+
+clean-dev: ## Clean the docker volumes used in `make dev`
+	$(RUN) "docker-compose -f ./services/kafka/docker-compose.yml down -v"
+
+docker-push-pets: ## Push docker image for pets
+	$(RUN) "docker push $(DOCKER_ORG)/petstore-kafka-pets:latest"
+
+docker-push-adoptions: ## Push docker image for adoptions
+	$(RUN) "docker push $(DOCKER_ORG)/petstore-kafka-adoptions:latest"
+
+docker-push-websocket: ## Push docker image for websocket
+	$(RUN) "docker push $(DOCKER_ORG)/petstore-kafka-websocket:latest"
+
+docker-push-web-ui: ## Push docker image for web-ui
+	$(RUN) "docker push $(DOCKER_ORG)/petstore-kafka-web-ui:latest"
+
+docker-push: docker-push-pets docker-push-adoptions docker-push-websocket docker-push-web-ui ## Push ALL docker images
+
+build-adoptions: ## Build docker image for Adoptions service
+	$(RUN) "cd ./services && docker build -f Dockerfile.adoptions -t $(DOCKER_ORG)/petstore-kafka-adoptions:latest ."
+
+build-websocket: ## Build docker image for Websocket service
+	$(RUN) "cd ./services && docker build -f Dockerfile.websocket -t $(DOCKER_ORG)/petstore-kafka-websocket:latest ."
+
+build-web-ui: ## Build docker image for SPA (includes caddy gateway)
+	$(RUN) "cd ./web-ui && docker build -f Dockerfile -t $(DOCKER_ORG)/petstore-kafka-web-ui:latest ."
 
 start: ## Start the entire stack via docker-compose. May require building images first with make build.
 	$(RUN) "docker-compose up"
