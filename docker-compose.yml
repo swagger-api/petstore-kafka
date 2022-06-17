@@ -1,5 +1,9 @@
 version: "2"
 
+## NOTE NOTE! 
+# Because kafka needs to know it's own hostname, you either need to change it in this document (from kafka.local)
+## Or add kafka.local to your /etc/hosts file (and point it at 127.0.0.1).
+
 services:
 
   # Main frontend
