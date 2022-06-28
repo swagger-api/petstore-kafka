@@ -8,6 +8,11 @@ COPY websocket/package.json /srv/
 COPY websocket/yarn.lock /srv/
 RUN yarn 
 
+# Install deps found in lib
+COPY lib/package.json /lib/
+COPY lib/yarn.lock /lib/
+RUN cd /lib && yarn
+
 # Files
 COPY lib /lib
 COPY websocket /srv

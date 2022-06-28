@@ -8,6 +8,11 @@ COPY adoptions/package.json /srv/
 COPY adoptions/yarn.lock /srv/
 RUN yarn 
 
+# Install deps found in lib
+COPY lib/package.json /lib/
+COPY lib/yarn.lock /lib/
+RUN cd /lib && yarn
+
 # Files
 COPY lib /lib
 COPY adoptions /srv
