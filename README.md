@@ -5,6 +5,8 @@ It is build on Kafka topics written in Nodejs.
 
 It exists as a functional example for describing with AsyncAPI.
 
+You can see a live demo of this running at https://petstore-kafka.swagger.io
+
 > NOTE: Given the way Kafka rebalances and the need for cacheing, it may take a while (a few minutes) for caches to be built, depending on the size of the Topic.
 
 
