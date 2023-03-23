@@ -72,6 +72,8 @@ services:
     image: docker.io/bitnami/kafka:3.2
     volumes:
       - "kafka_data:/bitnami"
+    ports:
+      - "9092:9092"
     environment:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
