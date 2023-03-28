@@ -562,7 +562,13 @@ components:
    "status" : "available",\r
    "id" : "b6da2c5d-58b5-4525-bd5d-3950e5a930b1"\r
 }</con:message>
-            <con:parameters/>
+            <con:parameters>
+              <con:parameter>
+                <con:name/>
+                <con:value xsi:nil="true"/>
+                <con:type>Header</con:type>
+              </con:parameter>
+            </con:parameters>
           </con:kafkaPublishStep>
         </con:config>
       </con:testStep>
@@ -605,7 +611,6 @@ components:
                   <con:operatorId>9</con:operatorId>
                   <con:enabled>true</con:enabled>
                   <con:expectedValue>TobyPost</con:expectedValue>
-                  <con:caseSensitive>true</con:caseSensitive>
                   <con:numberType>false</con:numberType>
                   <con:expectedDataType>1</con:expectedDataType>
                 </con:elements>
@@ -615,7 +620,6 @@ components:
                   <con:operatorId>9</con:operatorId>
                   <con:enabled>true</con:enabled>
                   <con:expectedValue>Galway</con:expectedValue>
-                  <con:caseSensitive>true</con:caseSensitive>
                   <con:numberType>false</con:numberType>
                   <con:expectedDataType>1</con:expectedDataType>
                 </con:elements>
@@ -625,7 +629,6 @@ components:
                   <con:operatorId>9</con:operatorId>
                   <con:enabled>true</con:enabled>
                   <con:expectedValue>onhold</con:expectedValue>
-                  <con:caseSensitive>true</con:caseSensitive>
                   <con:numberType>false</con:numberType>
                   <con:expectedDataType>1</con:expectedDataType>
                 </con:elements>
@@ -634,8 +637,7 @@ components:
                   <con:element>id</con:element>
                   <con:operatorId>9</con:operatorId>
                   <con:enabled>true</con:enabled>
-                  <con:expectedValue>bf3f4063-084f-46df-9ea0-43892f5dabf1</con:expectedValue>
-                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:expectedValue>ad853c24-8459-4117-b87e-8c22b6166f9d</con:expectedValue>
                   <con:numberType>false</con:numberType>
                   <con:expectedDataType>1</con:expectedDataType>
                 </con:elements>
@@ -1085,7 +1087,7 @@ components:
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:parameters>
-              <con:entry key="id" value="24baf637-2ba1-4701-9b1b-bb47f4b684fb"/>
+              <con:entry key="id" value="fe85a19c-7641-400c-885b-670efa4b94d7"/>
             </con:parameters>
           </con:restRequest>
         </con:config>
@@ -1235,7 +1237,7 @@ components:
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:parameters>
-              <con:entry key="id" value="9725e2f6-ef26-4732-b44d-d8ea4f931557"/>
+              <con:entry key="id" value="a95e7b29-75b0-41f9-9a73-2fa93c7c9b5b"/>
             </con:parameters>
           </con:restRequest>
         </con:config>
