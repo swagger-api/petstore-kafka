@@ -55,5 +55,9 @@ All services have a Docker image and the entire stack can be brought up with `do
 
 To build all images, run `make build` which will build them one-by-one. All builds happen within the Docker context so it isn't required to run `yarn run build` beforehand.
 
-Alternatively you can build the indidvidual docker images with `make build-{service}` where `{service}` is the service. For a full list see `make help`.
+Alternatively you can build the individual docker images with `make build-{service}` where `{service}` is the service. For a full list see `make help`.
+
+## Testing
+
+Test projects for this application have been added to the [ReadyAPI-tests](./ReadyAPI-tests) folder. The projects have test across the OpenAPI and AsyncAPIs as described in the [API Section](#openapi-and-asyncapi). In order to run these tests you need to have ReadyAPI installed. A free-trial can be obtained via https://www.soapui.org/downloads/download-readyapi-trial/
 
