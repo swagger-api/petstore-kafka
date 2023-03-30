@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="afd2e5e3-5d86-4d1b-9a3e-61d8f6649ea2" created="3.44.1" activeEnvironment="Default environment" name="Kafka-Petstore-Adding-Pets" projectVersion="" updated="3.44.1 2023-03-15T15:35:59Z" encryptionMode="Not encrypted" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:RestService" id="c69890e3-fea7-4c21-9cae-f5f4c7159df8" name="Pets and Adoption API" type="rest_ex" wadlVersion="https://swagger.io/openapiv3/specification" definitionUrl="https://api.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:description>An API for tracking **Pets** and **Pet Adoptions** across our event and REST based petstore. This OpenAPI definition describes the RESTful APIs offered by the store.
+
+Links:
+- [The code repository housing the implementation](https://github.com/swagger-api/petstore-kafka)
+
+Other useful information related to this API:</con:description>
+    <con:settings/>
+    <con:definitionCache type="TEXT" rootPart="https://api.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API/1.0.0">
+      <con:part>
+        <con:url>https://api.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API/1.0.0</con:url>
+        <con:content>{"openapi":"3.0.0","info":{"version":"1.0.0","title":"Pets and Adoption API","description":"An API for tracking **Pets** and **Pet Adoptions** across our event and REST based petstore. This OpenAPI definition describes the RESTful APIs offered by the store.\n\nLinks:\n- [The code repository housing the implementation](https://github.com/swagger-api/petstore-kafka)\n\nOther useful information related to this API:\n","termsOfService":"http://swagger.io/terms/","contact":{"email":"apiteam@swagger.io"},"license":{"name":"Apache 2.0","url":"http://www.apache.org/licenses/LICENSE-2.0.html"}},"tags":[{"name":"pets","description":"Everything about your Pets"},{"name":"adoptions","description":"Adoption information for pets in our stores"}],"paths":{"/pets":{"get":{"tags":["pets"],"summary":"Get a list of pets within the store","description":"A list of pets with information on their status and location","operationId":"getPets","parameters":[{"name":"status","in":"query","description":"Status values that need to be considered for filter","required":false,"explode":true,"schema":{"type":"string","description":"the adoption status of the pet","default":"available","enum":["available","pending","onhold","adopted"]}},{"name":"location","in":"query","description":"the store location of the pet","required":false,"schema":{"type":"string","example":"Galway"}}],"responses":{"200":{"description":"Get Pets response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pets"}}}},"default":{"description":"Get Pets response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pets"}}}}}},"post":{"tags":["pets"],"summary":"Add a new pet to the store","description":"Add a new pet to the store","operationId":"postPet","requestBody":{"description":"Create a new pet in the store","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pet"}}},"required":true},"responses":{"201":{"description":"Pet Created Successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pet"}}}}}}},"/pets/{id}":{"patch":{"tags":["pets"],"summary":"Update the status of a pet","description":"Use this operation to update the adoption status of a pet","operationId":"patchPetStatus","parameters":[{"name":"id","in":"path","description":"The identifier for the path","required":true,"schema":{"type":"string","example":"a76b67cb-7976-4b94-af8e-381688c915ad"}}],"requestBody":{"description":"the new status information","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PetStatus"}}},"required":true},"responses":{"200":{"description":"Pet status updated successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pet"}}}},"404":{"description":"Pet not found"}}}},"/adoptions":{"get":{"tags":["adoptions"],"summary":"Get a list of current pet adoptions","description":"A list of adoptions with information on their status and pet","operationId":"getAdoptions","parameters":[{"name":"status","in":"query","description":"Status values that need to be considered for filter","required":false,"explode":true,"schema":{"type":"string","description":"the adoption status","enum":["requested","pending","available","denied","approved"]}},{"name":"location","in":"query","description":"the store location of the pet adoption","required":false,"schema":{"type":"string","example":"Plett"}}],"responses":{"200":{"description":"Get Adoptions response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoptions"}}}},"default":{"description":"Get Adoptions response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoptions"}}}}}},"post":{"tags":["adoptions"],"summary":"Add a new adoption","description":"Add a new pet to the store","operationId":"postAdoption","requestBody":{"description":"Create a new adoption request","content":{"application/json":{"schema":{"$ref":"#/components/schemas/NewAdoption"}}},"required":true},"responses":{"201":{"description":"Pet Created Successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoption"}}}}}}},"/adoptions/{id}":{"patch":{"tags":["adoptions"],"summary":"Update the status of an adoption","description":"Use this operation to update the adoption status of an adoption","operationId":"patchAdoptionStatus","parameters":[{"name":"id","in":"path","description":"The identifier for the path","required":true,"schema":{"type":"string","example":"a76b67cb-7976-4b94-af8e-381688c915ad"}}],"requestBody":{"description":"the new status information","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AdoptionStatus"}}},"required":true},"responses":{"200":{"description":"Pet status updated successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoption"}}}},"404":{"description":"Adoption not found"}}}}},"components":{"schemas":{"Pet":{"type":"object","properties":{"name":{"type":"string","description":"the name of the pet","example":"Rover"},"location":{"type":"string","description":"the store location housing the pet","example":"plett"},"id":{"type":"string","description":"a _guid_ identifier of the pet","example":"a76b67cb-7976-4b94-af8e-381688c915ad"},"status":{"type":"string","description":"the adoption status of the pet","default":"available","example":"available","enum":["available","pending","onhold","adopted"]}}},"Pets":{"type":"array","items":{"$ref":"#/components/schemas/Pet"}},"PetStatus":{"type":"object","properties":{"status":{"type":"string","description":"the adoption status of the pet","default":"available","example":"available","enum":["available","pending","onhold","adopted"]}}},"AdoptionReason":{"type":"object","properties":{"petId":{"type":"string","description":"the pet id"},"message":{"type":"string","description":"a custom note providing some additional context about the reason for adopting the pet"}}},"Adoption":{"type":"object","properties":{"id":{"type":"string","description":"a _guid_ identifier of the adoption","example":"a76b67cb-7976-4b94-af8e-381688c915ad"},"status":{"type":"string","description":"the status of the adoption","example":"requested","enum":["requested","pending","available","denied","approved"]},"pets":{"type":"array","items":{"type":"string"}},"reasons":{"type":"array","items":{"$ref":"#/components/schemas/AdoptionReason"}}}},"Adoptions":{"type":"array","items":{"$ref":"#/components/schemas/Adoption"}},"NewAdoption":{"type":"object","properties":{"pets":{"type":"array","description":"the pets to be part of this adoption","items":{"type":"string"}},"location":{"type":"string","description":"the location of the pet adoption"}}},"AdoptionStatus":{"type":"object","properties":{"status":{"type":"string","description":"the adoption status of the pet","example":"approved","enum":["requested","pending","available","denied","approved"]}}}}},"servers":[{"description":"SwaggerHub API Auto Mocking","url":"https://virtserver.swaggerhub.com/SwaggerPMTests/Pets-Adoption-API/1.0.0"},{"description":"Local Docker","url":"http://localhost:80/api"},{"url":"https://petstore-kafka.swagger.io/api"}]}</con:content>
+        <con:type>https://swagger.io/openapiv3/specification</con:type>
+      </con:part>
+    </con:definitionCache>
+    <con:endpoints>
+      <con:endpoint>http://localhost:80/api</con:endpoint>
+      <con:endpoint>https://petstore-kafka.swagger.io/api</con:endpoint>
+      <con:endpoint>https://virtserver.swaggerhub.com/SwaggerPMTests/Pets-Adoption-API/1.0.0</con:endpoint>
+    </con:endpoints>
+    <con:resource name="/pets" path="/pets" id="94240ff2-3b27-45a3-a605-ef7c11a4d9bf">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="getPets" id="254b130e-5015-4dbf-87ab-eb9a7bc29e05" method="GET">
+        <con:description>A list of pets with information on their status and location</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter>
+            <con:name>status</con:name>
+            <con:value>available</con:value>
+            <con:style>QUERY</con:style>
+            <con:default>available</con:default>
+            <con:description>Status values that need to be considered for filter</con:description>
+          </con:parameter>
+          <con:parameter>
+            <con:name>location</con:name>
+            <con:style>QUERY</con:style>
+            <con:description>the store location of the pet</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Get Pets response</con:description>
+          <con:sampleContent>[ {
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+} ]</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="3d885ab4-f33a-44e4-9369-766c81513ad7" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+      <con:method name="postPet" id="bd6d45b1-5476-425b-8c49-cc47b9b69984" method="POST">
+        <con:description>Add a new pet to the store</con:description>
+        <con:settings/>
+        <con:parameters/>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>201</con:status>
+          <con:params/>
+          <con:description>Pet Created Successfully</con:description>
+          <con:sampleContent>{
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="28bc09d5-5d73-4e20-a8df-de4a1d5f0383" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "name" : "Rover",\r
+  "location" : "plett",\r
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",\r
+  "status" : "available"\r
+}</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+    </con:resource>
+    <con:resource name="/pets/{id}" path="/pets/{id}" id="3157d68b-1a21-43ef-a304-103fb2309094">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="patchPetStatus" id="8f3ad8fd-94f1-4979-b76a-b1f3a4153822" method="PATCH">
+        <con:description>Use this operation to update the adoption status of a pet</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter required="true">
+            <con:name>id</con:name>
+            <con:style>TEMPLATE</con:style>
+            <con:description>The identifier for the path</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Pet status updated successfully</con:description>
+          <con:sampleContent>{
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="703ea30c-c0f6-4376-929e-ff1074e9e48f" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "status" : "available"\r
+}</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+    </con:resource>
+    <con:resource name="/adoptions" path="/adoptions" id="f0190d72-7316-43d9-a041-3367064eb7e9">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="getAdoptions" id="470f4155-90f9-4825-891c-f434d2e60b5d" method="GET">
+        <con:description>A list of adoptions with information on their status and pet</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter>
+            <con:name>status</con:name>
+            <con:style>QUERY</con:style>
+            <con:description>Status values that need to be considered for filter</con:description>
+          </con:parameter>
+          <con:parameter>
+            <con:name>location</con:name>
+            <con:style>QUERY</con:style>
+            <con:description>the store location of the pet adoption</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Get Adoptions response</con:description>
+          <con:sampleContent>[ {
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "requested",
+  "pets" : [ "string" ],
+  "reasons" : [ {
+    "petId" : "string",
+    "message" : "string"
+  } ]
+} ]</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="94d9274c-9a73-40ad-bd5f-7287e8995dea" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+      <con:method name="postAdoption" id="18152421-1694-4650-9cc9-10461351c026" method="POST">
+        <con:description>Add a new pet to the store</con:description>
+        <con:settings/>
+        <con:parameters/>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>201</con:status>
+          <con:params/>
+          <con:description>Pet Created Successfully</con:description>
+          <con:sampleContent>{
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "requested",
+  "pets" : [ "string" ],
+  "reasons" : [ {
+    "petId" : "string",
+    "message" : "string"
+  } ]
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "pets" : [ "string" ],
+  "location" : "string"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="a4bf6a61-e1a9-418b-8cc5-4b67f796eaac" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "pets" : [ "string" ],\r
+  "location" : "string"\r
+}</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+    </con:resource>
+    <con:resource name="/adoptions/{id}" path="/adoptions/{id}" id="21173822-301c-487d-885d-77ddcddfcef5">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="patchAdoptionStatus" id="767631c8-bad7-4cdf-b99d-63898152259e" method="PATCH">
+        <con:description>Use this operation to update the adoption status of an adoption</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter required="true">
+            <con:name>id</con:name>
+            <con:style>TEMPLATE</con:style>
+            <con:description>The identifier for the path</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Pet status updated successfully</con:description>
+          <con:sampleContent>{
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "requested",
+  "pets" : [ "string" ],
+  "reasons" : [ {
+    "petId" : "string",
+    "message" : "string"
+  } ]
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "status" : "approved"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="6e11f711-a656-4786-98df-b38a537ac9f5" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "status" : "approved"\r
+}</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+    </con:resource>
+  </con:interface>
+  <con:interface xsi:type="con:MessageDrivenService" id="649db0e3-714d-4172-80be-d4c8d718f282" name="Petstore Kafka - Pets" type="messagedrivenservice" definitionVersion="1.0.0" definitionUrl="file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-pets-1.0.0-swagger.yaml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:description>A simple demo API based on a real implementation. 
+This is part of a stack.</con:description>
+    <con:settings/>
+    <con:definitionCache type="TEXT" rootPart="file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-pets-1.0.0-swagger.yaml">
+      <con:part>
+        <con:url>file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-pets-1.0.0-swagger.yaml</con:url>
+        <con:content>asyncapi: '2.4.0'
+info:
+  title: Petstore Kafka - Pets
+  version: '1.0.0'
+  description: |
+    A simple demo API based on a real implementation. 
+    This is part of a stack.
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  local:
+    url: localhost:9092
+    protocol: kafka
+    description: When running the dev stack.
+  compose:
+    url: kafka:9092
+    protocol: kafka
+    description: When running within docker-compose
+  
+defaultContentType: application/json
+
+channels:
+  pets.added:
+    description: Pets that are added
+    publish:
+      summary: New Pet added.
+      operationId: addPet
+      traits:
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        description: New Pets
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/NewPet"
+
+  pets.statusChanged:
+    description: |
+      Cache pet statuses to know if an adoption is possible.
+    subscribe:
+      summary: Pet's status has changed.
+      operationId: cachePetStatus
+      traits:
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        description: New Pets
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/PetStatusChange"
+
+components:
+  operationTraits:
+    kafka:
+      bindings:
+        kafka:
+          clientId: 
+            type: string</con:content>
+        <con:type>https://www.asyncapi.com/docs/specifications/2.0.0</con:type>
+      </con:part>
+    </con:definitionCache>
+    <con:endpoints>
+      <con:endpoint>kafka.local:9092</con:endpoint>
+      <con:endpoint>localhost:9092</con:endpoint>
+    </con:endpoints>
+    <con:channel name="pets.added" id="5a298693-7f30-48c7-a92f-cf27096a3a24">
+      <con:description>Pets that are added</con:description>
+      <con:settings/>
+      <con:subscribeOperation name="Subscribe" id="5344f0a9-6450-44ca-95c6-6a2f47719827">
+        <con:settings/>
+      </con:subscribeOperation>
+      <con:publishOperation name="Publish" id="c57ef8ad-7df5-48b3-b030-a60ef8e0f78d">
+        <con:settings/>
+      </con:publishOperation>
+    </con:channel>
+    <con:channel name="pets.statusChanged" id="9360b31c-03d9-4491-8d7c-b77bf0b4160a">
+      <con:description>Cache pet statuses to know if an adoption is possible.</con:description>
+      <con:settings/>
+      <con:subscribeOperation name="Subscribe" id="4f91bf6b-6917-4fc2-8768-f6b04f78cfaa">
+        <con:settings/>
+      </con:subscribeOperation>
+      <con:publishOperation name="Publish" id="e9e8f71d-946f-424e-8bd7-f11ce2109306">
+        <con:settings/>
+      </con:publishOperation>
+    </con:channel>
+  </con:interface>
+  <con:testSuite id="e8d47585-4bef-41ce-b762-62f6eed58245" name="(Multi-protocol) - Add Pet and verify events">
+    <con:settings/>
+    <con:runType>PARALLELL</con:runType>
+    <con:testCase id="a9ac9976-ca38-4e16-8203-a3792a86f3f2" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Verify pets.added event" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe to pets.added and verify message" id="1e969919-45c0-45d2-a341-3f61d8a6014b">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>5344f0a9-6450-44ca-95c6-6a2f47719827</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>pets.added</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>kafka.local:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>5</con:maxIdleTime>
+            <con:maxMessagesReceived>1</con:maxMessagesReceived>
+            <con:maxRunTime>4</con:maxRunTime>
+            <con:assertion type="DataAndMetadataAssertion" id="1062ac10-73ae-4cab-b8ec-b4eb4416ccc5" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>TobyDemo</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>available</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>9</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>83c3a968-97a6-45df-86c8-ec9b0e5591fa</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"name":"TobyDemo","location":"Galway","status":"available","id":"83c3a968-97a6-45df-86c8-ec9b0e5591fa"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:testCase id="ef962c79-76ea-42ef-a572-b36f11a44917" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Add a Pet" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="delay" name="Delay - ms" id="1a3dad77-add4-4671-bda9-579762666391">
+        <con:settings/>
+        <con:config>
+          <delay>200</delay>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="POST pets" id="38fb39f4-3843-4c5a-b125-33826bb38936">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/pets" methodName="postPet" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="POST pets" id="28bc09d5-5d73-4e20-a8df-de4a1d5f0383" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{
+  "name" : "TobyDemo",
+  "location" : "Galway",
+  "status" : "available"
+}</con:request>
+            <con:originalUri>http://localhost/api/pets</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="86f67e7b-e314-4b64-89c5-b14a6a74d152" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Response SLA Assertion" id="69b95ba6-1367-4a4b-9f8f-8c8802510b89" name="Response SLA">
+              <con:configuration>
+                <SLA>200</SLA>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:properties/>
+    <con:reportParameters/>
+  </con:testSuite>
+  <con:requirements/>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:databaseConnectionContainer/>
+  <con:jmsConnectionContainer/>
+  <con:oAuth2ProfileContainer/>
+  <con:oAuth1ProfileContainer/>
+  <con:reporting>
+    <con:reportTemplates/>
+    <con:xmlTemplates/>
+    <con:xmlTemplates/>
+    <con:parameters/>
+    <con:parameters/>
+  </con:reporting>
+  <con:reporting/>
+  <con:eventHandlers type="RequestFilter.filterRequest" name="RequestFilter.filterRequest">
+    <con:script>// Sample event script to add custom HTTP header to all outgoing REST, SOAP and HTTP(S) calls
+// This code is often used for adding custom authentication to ReadyAPI functional tests
+
+// If hardcoding the token, uncomment and change line 5
+// token = '4567'
+
+// If your token is parameterized in Project level custom property, uncomment line 8
+// token = request.parent.testCase.testSuite.project.getProperty('auth_token').getValue()
+
+// To modify all outgoing calls, remove comments from lines 11 to 16
+// headers = request.requestHeaders
+// if (headers.containsKey('auth_token2') == false) {
+//   headers.put('auth_token2', token)
+//   request.requestHeaders = headers
+// }</con:script>
+  </con:eventHandlers>
+  <con:eventHandlers type="TestRunListener.afterStep" name="TestRunListener.afterStep">
+    <con:script>// Save all test step results into files
+// Change the directory path in line 5 to a location where you want to store details
+// then uncomment lines 5 to 10
+
+// filePath = 'C:\\tempOutputDirectory\\'
+// fos = new java.io.FileOutputStream(filePath + testStepResult.testStep.label + '.txt', true)
+// pw = new java.io.PrintWriter(fos)
+// testStepResult.writeTo(pw)
+// pw.close()
+// fos.close()</con:script>
+  </con:eventHandlers>
+  <con:authRepository/>
+  <con:tags/>
+  <con:kafkaConnectionSettingsContainer>
+    <con:connectionSettings id="d152e43b-be97-42ae-a336-699b674614bb">
+      <con:subscribeProperties/>
+      <con:publishProperties/>
+      <con:schemaRegistry>
+        <con:url/>
+        <con:authProfile>No Authorization</con:authProfile>
+      </con:schemaRegistry>
+      <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+      <con:maxIdleTime>60</con:maxIdleTime>
+      <con:maxMessagesReceived>50</con:maxMessagesReceived>
+      <con:maxRunTime>60</con:maxRunTime>
+      <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+    </con:connectionSettings>
+  </con:kafkaConnectionSettingsContainer>
+</con:soapui-project>

@@ -1,0 +1,1911 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="af2ce02d-817e-4eff-a0ee-8e2d702dac06" created="3.44.1" activeEnvironment="Kafka Docker local" name="Kakfa-Petstore" projectVersion="" updated="3.44.1 2023-03-15T15:35:59Z" encryptionMode="Not encrypted" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:MessageDrivenService" id="a27aa0e8-24eb-46df-9668-a9abb865e2b2" name="Petstore Kafka - Pets" type="messagedrivenservice" definitionVersion="1.0.0" definitionUrl="file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-pets-1.0.0-swagger.yaml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:description>A simple demo API based on a real implementation. 
+This is part of a stack.</con:description>
+    <con:settings/>
+    <con:definitionCache type="TEXT" rootPart="file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-pets-1.0.0-swagger.yaml">
+      <con:part>
+        <con:url>file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-pets-1.0.0-swagger.yaml</con:url>
+        <con:content>asyncapi: '2.4.0'
+info:
+  title: Petstore Kafka - Pets
+  version: '1.0.0'
+  description: |
+    A simple demo API based on a real implementation. 
+    This is part of a stack.
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  local:
+    url: localhost:9092
+    protocol: kafka
+    description: When running the dev stack.
+  compose:
+    url: kafka:9092
+    protocol: kafka
+    description: When running within docker-compose
+  
+defaultContentType: application/json
+
+channels:
+  pets.added:
+    description: Pets that are added
+    publish:
+      summary: New Pet added.
+      operationId: addPet
+      traits:
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        description: New Pets
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/NewPet"
+
+  pets.statusChanged:
+    description: |
+      Cache pet statuses to know if an adoption is possible.
+    subscribe:
+      summary: Pet's status has changed.
+      operationId: cachePetStatus
+      traits:
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        description: New Pets
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/PetStatusChange"
+
+components:
+  operationTraits:
+    kafka:
+      bindings:
+        kafka:
+          clientId: 
+            type: string</con:content>
+        <con:type>https://www.asyncapi.com/docs/specifications/2.0.0</con:type>
+      </con:part>
+    </con:definitionCache>
+    <con:endpoints>
+      <con:endpoint>kafka:9092</con:endpoint>
+      <con:endpoint>localhost:9092</con:endpoint>
+    </con:endpoints>
+    <con:environmentSpec>
+      <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+    <con:channel name="pets.added" id="cefa5f00-f172-4e42-bbba-e64d46e86609">
+      <con:description>Pets that are added</con:description>
+      <con:settings/>
+      <con:subscribeOperation name="Subscribe" id="f1a87fe0-7dad-4448-963a-62ca07aae60e">
+        <con:settings/>
+        <con:environmentSpec>
+          <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:subscribeOperation>
+      <con:publishOperation name="Publish" id="3ac543b4-62d0-4cc1-b345-66e67608a7b7">
+        <con:settings/>
+        <con:environmentSpec>
+          <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:publishOperation>
+      <con:environmentSpec>
+        <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:channel>
+    <con:channel name="pets.statusChanged" id="44614174-262f-4159-b7d4-c6cfca5b89b5">
+      <con:description>Cache pet statuses to know if an adoption is possible.</con:description>
+      <con:settings/>
+      <con:subscribeOperation name="Subscribe" id="87fb3d7c-7d76-4028-afd3-62c6749c4d51">
+        <con:settings/>
+        <con:environmentSpec>
+          <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:subscribeOperation>
+      <con:publishOperation name="Publish" id="d1391078-92f3-4e10-8a86-bc0f4fe04697">
+        <con:settings/>
+        <con:environmentSpec>
+          <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:publishOperation>
+      <con:environmentSpec>
+        <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:channel>
+  </con:interface>
+  <con:interface xsi:type="con:RestService" id="c685d132-0bd3-4a7f-9665-00a3a017ce46" name="Pets and Adoption API" type="rest_ex" wadlVersion="https://swagger.io/openapiv3/specification" definitionUrl="https://api.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:description>An API for tracking **Pets** and **Pet Adoptions** across our event and REST based petstore. This OpenAPI definition describes the RESTful APIs offered by the store.
+
+Links:
+- [The code repository housing the implementation](https://github.com/swagger-api/petstore-kafka)
+
+Other useful information related to this API:</con:description>
+    <con:settings/>
+    <con:definitionCache type="TEXT" rootPart="https://api.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API/1.0.0">
+      <con:part>
+        <con:url>https://api.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API/1.0.0</con:url>
+        <con:content>{"openapi":"3.0.0","info":{"title":"Pets and Adoption API","description":"An API for tracking **Pets** and **Pet Adoptions** across our event and REST based petstore. This OpenAPI definition describes the RESTful APIs offered by the store.\n\nLinks:\n- [The code repository housing the implementation](https://github.com/swagger-api/petstore-kafka)\n\nOther useful information related to this API:\n","termsOfService":"http://swagger.io/terms/","contact":{"email":"apiteam@swagger.io"},"license":{"name":"Apache 2.0","url":"http://www.apache.org/licenses/LICENSE-2.0.html"},"version":"1.0.0"},"servers":[{"url":"https://virtserver.swaggerhub.com/SwaggerPMTests/Pets-Adoption-API/1.0.0","description":"SwaggerHub API Auto Mocking"},{"url":"http://localhost:80/api","description":"Local Docker"}],"tags":[{"name":"pets","description":"Everything about your Pets"},{"name":"adoptions","description":"Adoption information for pets in our stores"}],"paths":{"/pets/{id}":{"patch":{"tags":["pets"],"summary":"Update the status of a pet","description":"Use this operation to update the adoption status of a pet","operationId":"patchPetStatus","parameters":[{"name":"id","in":"path","description":"The identifier for the path","required":true,"style":"simple","explode":false,"schema":{"type":"string","example":"a76b67cb-7976-4b94-af8e-381688c915ad"}}],"requestBody":{"description":"the new status information","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PetStatus"}}},"required":true},"responses":{"200":{"description":"Pet status updated successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pet"}}}},"404":{"description":"Pet not found"}}}},"/adoptions":{"get":{"tags":["adoptions"],"summary":"Get a list of current pet adoptions","description":"A list of adoptions with information on their status and pet","operationId":"getAdoptions","parameters":[{"name":"status","in":"query","description":"Status values that need to be considered for filter","required":false,"style":"form","explode":true,"schema":{"type":"string","description":"the adoption status","enum":["requested","pending","available","denied","approved"]}},{"name":"location","in":"query","description":"the store location of the pet adoption","required":false,"style":"form","explode":true,"schema":{"type":"string","example":"Plett"}}],"responses":{"200":{"description":"Get Adoptions response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoptions"}}}},"default":{"description":"Get Adoptions response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoptions"}}}}}},"post":{"tags":["adoptions"],"summary":"Add a new adoption","description":"Add a new pet to the store","operationId":"postAdoption","requestBody":{"description":"Create a new adoption request","content":{"application/json":{"schema":{"$ref":"#/components/schemas/NewAdoption"}}},"required":true},"responses":{"201":{"description":"Pet Created Successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoption"}}}}}}},"/adoptions/{id}":{"patch":{"tags":["adoptions"],"summary":"Update the status of an adoption","description":"Use this operation to update the adoption status of an adoption","operationId":"patchAdoptionStatus","parameters":[{"name":"id","in":"path","description":"The identifier for the path","required":true,"style":"simple","explode":false,"schema":{"type":"string","example":"a76b67cb-7976-4b94-af8e-381688c915ad"}}],"requestBody":{"description":"the new status information","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AdoptionStatus"}}},"required":true},"responses":{"200":{"description":"Pet status updated successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Adoption"}}}},"404":{"description":"Adoption not found"}}}},"/pets":{"description":"","get":{"description":"A list of pets with information on their status and location","parameters":[{"name":"status","in":"query","required":false,"schema":{"type":"string"}},{"name":"location","in":"query","required":false,"schema":{"type":"string"}}],"responses":{"200":{"description":"Get Pets response","content":{"application/json":{"example":""}}}}},"post":{"description":"Add a new pet to the store","parameters":[{"name":"status","in":"query","required":true,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"example":"{\r\n  \"name\" : \"Rover\",\r\n  \"location\" : \"plett\",\r\n  \"id\" : \"a76b67cb-7976-4b94-af8e-381688c915ad\",\r\n  \"status\" : \"available\"\r\n}"}}},"responses":{"201":{"description":"Pet Created Successfully","content":{"application/json":{"example":""}}}}}}},"components":{"schemas":{"Pet":{"type":"object","properties":{"name":{"type":"string","description":"the name of the pet","example":"Rover"},"location":{"type":"string","description":"the store location housing the pet","example":"plett"},"id":{"type":"string","description":"a _guid_ identifier of the pet","example":"a76b67cb-7976-4b94-af8e-381688c915ad"},"status":{"type":"string","description":"the adoption status of the pet","example":"available","default":"available","enum":["available","pending","onhold","adopted"]}}},"Pets":{"type":"array","items":{"$ref":"#/components/schemas/Pet"}},"PetStatus":{"type":"object","properties":{"status":{"type":"string","description":"the adoption status of the pet","example":"available","default":"available","enum":["available","pending","onhold","adopted"]}}},"AdoptionReason":{"type":"object","properties":{"petId":{"type":"string","description":"the pet id"},"message":{"type":"string","description":"a custom note providing some additional context about the reason for adopting the pet"}}},"Adoption":{"type":"object","properties":{"id":{"type":"string","description":"a _guid_ identifier of the adoption","example":"a76b67cb-7976-4b94-af8e-381688c915ad"},"status":{"type":"string","description":"the status of the adoption","example":"requested","enum":["requested","pending","available","denied","approved"]},"pets":{"type":"array","items":{"type":"string"}},"reasons":{"type":"array","items":{"$ref":"#/components/schemas/AdoptionReason"}}}},"Adoptions":{"type":"array","items":{"$ref":"#/components/schemas/Adoption"}},"NewAdoption":{"type":"object","properties":{"pets":{"type":"array","description":"the pets to be part of this adoption","items":{"type":"string"}},"location":{"type":"string","description":"the location of the pet adoption"}}},"AdoptionStatus":{"type":"object","properties":{"status":{"type":"string","description":"the adoption status of the pet","example":"approved","enum":["requested","pending","available","denied","approved"]}}}}}}</con:content>
+        <con:type>https://swagger.io/openapiv3/specification</con:type>
+      </con:part>
+    </con:definitionCache>
+    <con:endpoints>
+      <con:endpoint>http://localhost:80/api</con:endpoint>
+      <con:endpoint>https://virtserver.swaggerhub.com/SwaggerPMTests/Pets-Adoption-API/1.0.0</con:endpoint>
+    </con:endpoints>
+    <con:resource name="/pets" path="/pets" id="11df628c-7f0c-4843-8481-954d66c00a1d">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="getPets" id="619f856e-660d-4672-8de9-1025d6f3acff" method="GET">
+        <con:description>A list of pets with information on their status and location</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter>
+            <con:name>status</con:name>
+            <con:value>available</con:value>
+            <con:style>QUERY</con:style>
+            <con:default>available</con:default>
+            <con:description>Status values that need to be considered for filter</con:description>
+          </con:parameter>
+          <con:parameter>
+            <con:name>location</con:name>
+            <con:style>QUERY</con:style>
+            <con:description>the store location of the pet</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Get Pets response</con:description>
+          <con:sampleContent>[ {
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+} ]</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="7e699173-300b-44bf-9076-d1d6545aabc6" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request/>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+      <con:method name="postPet" id="e091a95f-52a7-4e4d-a79c-1a43c462abb3" method="POST">
+        <con:description>Add a new pet to the store</con:description>
+        <con:settings/>
+        <con:parameters/>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>201</con:status>
+          <con:params/>
+          <con:description>Pet Created Successfully</con:description>
+          <con:sampleContent>{
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="5d072644-d94a-464c-bd56-0dcfc812b64f" mediaType="application/json" postQueryString="false">
+          <con:settings>
+            <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+          </con:settings>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "name" : "Rover",\r
+  "location" : "plett",\r
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",\r
+  "status" : "available"\r
+}</con:request>
+          <con:originalUri>http://localhost/api/pets</con:originalUri>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+          <con:parameters/>
+          <con:parameterOrder/>
+        </con:request>
+      </con:method>
+    </con:resource>
+    <con:resource name="/pets/{id}" path="/pets/{id}" id="5a3ada8f-a5ee-4505-996f-3b8919fb9de9">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="patchPetStatus" id="28bc05d9-ed70-41db-8679-40a67dd340ae" method="PATCH">
+        <con:description>Use this operation to update the adoption status of a pet</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter required="true">
+            <con:name>id</con:name>
+            <con:style>TEMPLATE</con:style>
+            <con:description>The identifier for the path</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Pet status updated successfully</con:description>
+          <con:sampleContent>{
+  "name" : "Rover",
+  "location" : "plett",
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "status" : "available"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="35cc33ed-3ef3-4e1f-816d-a5297e900d78" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "status" : "available"\r
+}</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+    </con:resource>
+    <con:resource name="/adoptions" path="/adoptions" id="c9fd772d-bcf4-4785-b9ed-309b89c13647">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="getAdoptions" id="e22cece1-f42f-47d5-b66e-3ae43b81d4c6" method="GET">
+        <con:description>A list of adoptions with information on their status and pet</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter>
+            <con:name>status</con:name>
+            <con:style>QUERY</con:style>
+            <con:description>Status values that need to be considered for filter</con:description>
+          </con:parameter>
+          <con:parameter>
+            <con:name>location</con:name>
+            <con:style>QUERY</con:style>
+            <con:description>the store location of the pet adoption</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Get Adoptions response</con:description>
+          <con:sampleContent>[ {
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "requested",
+  "pets" : [ "string" ],
+  "reasons" : [ {
+    "petId" : "string",
+    "message" : "string"
+  } ]
+} ]</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="b783b090-5cca-4763-820b-30f0b3b0cfc6" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+      <con:method name="postAdoption" id="e6a2f8e4-536e-46ed-b62b-9bb4f01b6f13" method="POST">
+        <con:description>Add a new pet to the store</con:description>
+        <con:settings/>
+        <con:parameters/>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>201</con:status>
+          <con:params/>
+          <con:description>Pet Created Successfully</con:description>
+          <con:sampleContent>{
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "requested",
+  "pets" : [ "string" ],
+  "reasons" : [ {
+    "petId" : "string",
+    "message" : "string"
+  } ]
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "pets" : [ "string" ],
+  "location" : "string"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="3df203d6-3dc5-4656-b401-65594e2d70fe" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "pets" : [ "string" ],\r
+  "location" : "string"\r
+}</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+    </con:resource>
+    <con:resource name="/adoptions/{id}" path="/adoptions/{id}" id="a6d97797-f5b0-469c-82ed-db3a0e054551">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="patchAdoptionStatus" id="318f397a-bdaa-4257-b8a5-1f6704b7d817" method="PATCH">
+        <con:description>Use this operation to update the adoption status of an adoption</con:description>
+        <con:settings/>
+        <con:parameters>
+          <con:parameter required="true">
+            <con:name>id</con:name>
+            <con:style>TEMPLATE</con:style>
+            <con:description>The identifier for the path</con:description>
+          </con:parameter>
+        </con:parameters>
+        <con:representation type="RESPONSE">
+          <con:mediaType>application/json</con:mediaType>
+          <con:status>200</con:status>
+          <con:params/>
+          <con:description>Pet status updated successfully</con:description>
+          <con:sampleContent>{
+  "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",
+  "status" : "requested",
+  "pets" : [ "string" ],
+  "reasons" : [ {
+    "petId" : "string",
+    "message" : "string"
+  } ]
+}</con:sampleContent>
+        </con:representation>
+        <con:representation type="REQUEST">
+          <con:mediaType>application/json</con:mediaType>
+          <con:params/>
+          <con:sampleContent>{
+  "status" : "approved"
+}</con:sampleContent>
+        </con:representation>
+        <con:request name="Request 1" id="81b331d7-ac73-4c23-a6c9-0e73c41ee67b" mediaType="application/json">
+          <con:settings/>
+          <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:request>{\r
+  "status" : "approved"\r
+}</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:parameters/>
+        </con:request>
+      </con:method>
+    </con:resource>
+  </con:interface>
+  <con:interface xsi:type="con:MessageDrivenService" id="367554d5-ba19-4022-956b-7d330438441e" name="Petstore Kafka - Adoptions" type="messagedrivenservice" definitionVersion="1.0.0" definitionUrl="file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-adoptions-1.0.0-swagger%20(1).yaml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:description>A simple demo API based on a real implementation. 
+This is part of a stack.</con:description>
+    <con:settings/>
+    <con:definitionCache type="TEXT" rootPart="file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-adoptions-1.0.0-swagger%20(1).yaml">
+      <con:part>
+        <con:url>file:/C:/Users/frank.kilcommins/Downloads/SwaggerPMTests-petstore-kafka-adoptions-1.0.0-swagger%20(1).yaml</con:url>
+        <con:content>asyncapi: '2.6.0'
+info:
+  title: Petstore Kafka - Adoptions
+  version: '1.0.0'
+  description: |
+    A simple demo API based on a real implementation. 
+    This is part of a stack.
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  local:
+    url: localhost:9092
+    protocol: kafka
+    description: When running the dev stack.
+  compose:
+    url: kafka:9092
+    protocol: kafka
+    description: When running within docker-compose
+  
+
+defaultContentType: application/json
+
+channels:
+  adoptions.requested:
+    description: A new adoption was requested
+    publish:
+      summary: New Adoption.
+      operationId: addAdoption
+      traits:
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/NewAdoption"
+
+  adoptions.statusChanged:
+    description: The status of the Adoption has changed.
+    subscribe:
+      traits: 
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        description: Adoption status changed
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/AdoptionStatusChanged"
+    publish:
+      traits: 
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        description: Adoption status changed
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/AdoptionStatusChanged"
+          
+  pets.statusChanged:
+    description: The status of the Pet has changed.
+    subscribe:
+      summary: Pet's status has changed.
+      operationId: changePetStatus
+      traits:
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        description: New Pets
+        payload: 
+          $ref: "https://api.swaggerhub.com/domains/SwaggerPMTests/petstore-common/1.0.0#/components/schemas/PetStatusChange"
+
+components:
+  operationTraits:
+    kafka:
+      bindings:
+        kafka:
+          clientId: 
+            type: string
+            const: adoptions</con:content>
+        <con:type>https://www.asyncapi.com/docs/specifications/2.0.0</con:type>
+      </con:part>
+    </con:definitionCache>
+    <con:endpoints>
+      <con:endpoint>kafka:9092</con:endpoint>
+      <con:endpoint>localhost:9092</con:endpoint>
+    </con:endpoints>
+    <con:channel name="adoptions.requested" id="e57ec31d-b1da-48ad-9757-836426d1e579">
+      <con:description>A new adoption was requested</con:description>
+      <con:settings/>
+      <con:subscribeOperation name="Subscribe" id="bdf59e2b-01e0-49a5-a761-e0ddcd5568f9">
+        <con:settings/>
+      </con:subscribeOperation>
+      <con:publishOperation name="Publish" id="01b25837-7614-446b-aef1-59cf53e97d08">
+        <con:settings/>
+      </con:publishOperation>
+    </con:channel>
+    <con:channel name="adoptions.statusChanged" id="cd86fab3-b34b-4ecb-a958-0d253f56d31e">
+      <con:description>The status of the Adoption has changed.</con:description>
+      <con:settings/>
+      <con:subscribeOperation name="Subscribe" id="7e2e45ec-83a1-458f-8431-25f122c1aca0">
+        <con:settings/>
+      </con:subscribeOperation>
+      <con:publishOperation name="Publish" id="4e502a3d-2ab1-42af-adc8-30be1974fb2c">
+        <con:settings/>
+      </con:publishOperation>
+    </con:channel>
+    <con:channel name="pets.statusChanged" id="1584b803-b302-48a5-8391-3c7fdd808eb3">
+      <con:description>The status of the Pet has changed.</con:description>
+      <con:settings/>
+      <con:subscribeOperation name="Subscribe" id="59e04fc4-720d-4998-ba85-9dc7df80e490">
+        <con:settings/>
+      </con:subscribeOperation>
+    </con:channel>
+  </con:interface>
+  <con:testSuite id="1354f79d-aa0d-4a7a-a8a3-8a69c1c7846a" name="(Kafka) - Pets added Pub/Sub verification">
+    <con:settings/>
+    <con:runType>PARALLELL</con:runType>
+    <con:testCase id="19ed6b90-a350-4b5b-9a2d-801572d73978" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="pets.added topic tests" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="multiConfigureTestStep" name="Publish" id="9f0cc6e7-f569-4b62-89e7-121101ccd2d1">
+        <con:settings/>
+        <con:config activeStep="kafkaPublishTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaPublishStep>
+            <con:operationId>3ac543b4-62d0-4cc1-b345-66e67608a7b7</con:operationId>
+            <con:operationName>Publish</con:operationName>
+            <con:channelName>pets.added</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:authProfile>Inherit From Parent</con:authProfile>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:message>{\r
+   "name" : "TobyGalway",\r
+   "location" : "Galway",\r
+   "status" : "available",\r
+   "id" : "b6da2c5d-58b5-4525-bd5d-3950e5a930b1"\r
+}</con:message>
+            <con:parameters>
+              <con:parameter>
+                <con:name/>
+                <con:value xsi:nil="true"/>
+                <con:type>Header</con:type>
+              </con:parameter>
+            </con:parameters>
+          </con:kafkaPublishStep>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe" id="3e0b4c97-8c31-49e7-a3e5-0a060144e3be">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>f1a87fe0-7dad-4448-963a-62ca07aae60e</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>pets.added</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:authProfile>Inherit From Parent</con:authProfile>
+                <con:connectionSettings>
+                  <con:subscribeProperties/>
+                  <con:schemaRegistry/>
+                  <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+                  <con:maxIdleTime>5</con:maxIdleTime>
+                  <con:maxMessagesReceived>50</con:maxMessagesReceived>
+                  <con:maxRunTime>5</con:maxRunTime>
+                  <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
+                </con:connectionSettings>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>60</con:maxIdleTime>
+            <con:maxMessagesReceived>50</con:maxMessagesReceived>
+            <con:maxRunTime>60</con:maxRunTime>
+            <con:assertion type="DataAndMetadataAssertion" id="ce5022ce-7697-4f29-8c40-cc91a65e3ab1" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>9</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>TobyPost</con:expectedValue>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>9</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>9</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>onhold</con:expectedValue>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>9</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>ad853c24-8459-4117-b87e-8c22b6166f9d</con:expectedValue>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"name":"TobyPost","location":"Galway","status":"onhold","id":"bf3f4063-084f-46df-9ea0-43892f5dabf1"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:properties/>
+    <con:reportParameters/>
+    <con:environmentSpec>
+      <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:testSuite>
+  <con:testSuite id="023e2a40-6f7a-4c48-8411-d3eee3bc18c7" name="(Kafka) - Pets statusChanged Pub/Sub verification">
+    <con:settings/>
+    <con:runType>PARALLELL</con:runType>
+    <con:testCase id="e9dfcc9a-c3b8-4578-b31c-8a41b58f388d" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="pets.statusChanged topic tests" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe" id="3e5ec224-af94-4116-ab3a-5a69e1b995f1">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>87fb3d7c-7d76-4028-afd3-62c6749c4d51</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>pets.statusChanged</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:authProfile>No Authorization</con:authProfile>
+                <con:connectionSettings>
+                  <con:subscribeProperties/>
+                  <con:schemaRegistry/>
+                  <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+                  <con:maxIdleTime>5</con:maxIdleTime>
+                  <con:maxMessagesReceived>1</con:maxMessagesReceived>
+                  <con:maxRunTime>5</con:maxRunTime>
+                  <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
+                </con:connectionSettings>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>60</con:maxIdleTime>
+            <con:maxMessagesReceived>50</con:maxMessagesReceived>
+            <con:maxRunTime>60</con:maxRunTime>
+            <con:assertion type="DataAndMetadataAssertion" id="147c8bbb-4624-438d-8868-2e1ca88b3c69" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>TobyGalway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>available</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>b6da2c5d-58b5-4525-bd5d-3950e5a930b1</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{
+   "name" : "TobyGalway",
+   "location" : "Galway",
+   "status" : "available",
+   "id" : "b6da2c5d-58b5-4525-bd5d-3950e5a930b1"
+}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="multiConfigureTestStep" name="Publish" id="6f514427-d87d-414c-9d6b-bdbd1ef80386">
+        <con:settings/>
+        <con:config activeStep="kafkaPublishTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaPublishStep>
+            <con:operationId>d1391078-92f3-4e10-8a86-bc0f4fe04697</con:operationId>
+            <con:operationName>Publish</con:operationName>
+            <con:channelName>pets.statusChanged</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:authProfile>Inherit From Parent</con:authProfile>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:message>{\r
+   "name" : "TobyGalway",\r
+   "location" : "Galway",\r
+   "status" : "available",\r
+   "id" : "b6da2c5d-58b5-4525-bd5d-3950e5a930b1"\r
+}</con:message>
+            <con:parameters/>
+          </con:kafkaPublishStep>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:properties/>
+    <con:reportParameters/>
+  </con:testSuite>
+  <con:testSuite id="02c78f08-d6ce-4a2e-8c86-480b43c650c5" name="(Kafka) - Adoptions requested Pub/Sub verification">
+    <con:settings/>
+    <con:runType>PARALLELL</con:runType>
+    <con:testCase id="15bf7864-9dee-4bcc-bf36-0a8a22600bc3" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="adoptions.requested topic tests" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe" id="f6bdce3b-973f-4776-9343-9cd520430dc7">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>bdf59e2b-01e0-49a5-a761-e0ddcd5568f9</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>adoptions.requested</con:channelName>
+            <con:serviceName>Petstore Kafka - Adoptions</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:connectionSettings>
+                  <con:subscribeProperties/>
+                  <con:schemaRegistry/>
+                  <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+                  <con:maxIdleTime>5</con:maxIdleTime>
+                  <con:maxMessagesReceived>1</con:maxMessagesReceived>
+                  <con:maxRunTime>5</con:maxRunTime>
+                  <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
+                </con:connectionSettings>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>60</con:maxIdleTime>
+            <con:maxMessagesReceived>50</con:maxMessagesReceived>
+            <con:maxRunTime>60</con:maxRunTime>
+            <con:assertion type="DataAndMetadataAssertion" id="7c01ca03-380e-4317-84f4-069cb78fc4bc" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['pets'][0]</con:path>
+                  <con:element>0</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>920baffd-eba2-4378-a17c-0f4d3c338633</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>05288d4e-7af1-4c2f-88d6-e5f5868b9fff</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{
+   "pets" : [
+      "920baffd-eba2-4378-a17c-0f4d3c338633"
+   ],
+   "location" : "Galway",
+   "id" : "05288d4e-7af1-4c2f-88d6-e5f5868b9fff"
+}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="multiConfigureTestStep" name="Publish" id="b61bef03-cefb-47bd-bfeb-ea6b3890c449">
+        <con:settings/>
+        <con:config activeStep="kafkaPublishTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaPublishStep>
+            <con:operationId>01b25837-7614-446b-aef1-59cf53e97d08</con:operationId>
+            <con:operationName>Publish</con:operationName>
+            <con:channelName>adoptions.requested</con:channelName>
+            <con:serviceName>Petstore Kafka - Adoptions</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:messageType>JSON</con:messageType>
+            <con:message>{
+   "pets" : [
+      "920baffd-eba2-4378-a17c-0f4d3c338633"
+   ],
+   "location" : "Galway",
+   "id" : "05288d4e-7af1-4c2f-88d6-e5f5868b9fff"
+}</con:message>
+            <con:parameters/>
+          </con:kafkaPublishStep>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:properties/>
+    <con:reportParameters/>
+  </con:testSuite>
+  <con:testSuite id="3615ca43-51d4-4f8e-8485-e19c7aa194f2" name="(REST) - Pets and Adoptions API - Tests">
+    <con:description>The test suite generated for the REST service [Pets and Adoption API]</con:description>
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase id="4e33003b-1f79-4e68-a024-e77fcd9d6e56" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="/pets Test Case" searchProperties="true" timeout="0">
+      <con:description>The test case generated for the REST resource [/pets] located at [/pets]</con:description>
+      <con:settings/>
+      <con:testStep type="restrequest" name="GET pets" id="5001fc30-e741-43e3-b8a6-81bdbca82496">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/pets" methodName="getPets" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="GET pets" id="7e699173-300b-44bf-9076-d1d6545aabc6" mediaType="application/json">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request/>
+            <con:originalUri>http://localhost/api/pets</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="c67787ff-0137-4699-8632-0247a9205a2c" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters>
+              <con:entry key="status" value=""/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="POST pets" id="b8b58a79-36f3-42fb-b6a1-58445731c1df">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/pets" methodName="postPet" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="POST pets" id="5d072644-d94a-464c-bd56-0dcfc812b64f" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{\r
+  "name" : "Toby",\r
+  "location" : "Galway",\r
+  "status" : "onhold"\r
+}</con:request>
+            <con:originalUri>http://localhost/api/pets</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="2ec9cdbd-46ef-47a7-b2a2-f1da90cf9b3e" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="DataAndMetadataAssertion" id="0718ac4d-5ecb-4f4b-bff0-e57ba9e9b9fc" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Toby</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>onhold</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>false</con:enabled>
+                  <con:expectedValue>169ffbf1-b5d9-4056-bfa9-708c77692f62</con:expectedValue>
+                  <con:caseSensitive>false</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"name":"Toby","location":"Galway","status":"available","id":"169ffbf1-b5d9-4056-bfa9-708c77692f62"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters/>
+            <con:parameterOrder/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="transfer" name="Transfer petId" id="de797bb6-b2f7-4224-980f-5621fce53a6e">
+        <con:settings/>
+        <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false">
+            <con:name>id</con:name>
+            <con:sourceType>Response</con:sourceType>
+            <con:sourceStep>POST pets</con:sourceStep>
+            <con:sourcePath>$['id']</con:sourcePath>
+            <con:targetType>id</con:targetType>
+            <con:targetStep>PATCH status</con:targetStep>
+            <con:targetPath/>
+            <con:type>JSONPATH</con:type>
+            <con:upgraded>true</con:upgraded>
+          </con:transfers>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="PATCH status" id="af21d84f-7aaa-464b-b369-f499df72cb84">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/pets/{id}" methodName="patchPetStatus" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="PATCH status" id="35cc33ed-3ef3-4e1f-816d-a5297e900d78" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{\r
+  "status" : "available"\r
+}</con:request>
+            <con:originalUri>http://localhost/api/pets/</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="e4e963d3-35d4-4d2a-854e-29a6e279aec2" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="DataAndMetadataAssertion" id="56704896-2e2e-4422-8ab5-7c2d69dd247c" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Toby</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>available</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>false</con:enabled>
+                  <con:expectedValue>74831936-7848-4e47-bf52-033785f2d142</con:expectedValue>
+                  <con:caseSensitive>false</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"name":"Toby","location":"Galway","status":"available","id":"74831936-7848-4e47-bf52-033785f2d142"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters>
+              <con:entry key="id" value="6899480a-f659-4f98-a456-9944924fdc96"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:testCase id="f8469c00-d6be-472f-be06-ac5b76ac59db" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="/adoptions Test Case" searchProperties="true" timeout="0">
+      <con:description>The test case generated for the REST resource [/adoptions] located at [/adoptions]</con:description>
+      <con:settings/>
+      <con:testStep type="restrequest" name="GET adoptions" id="db231c69-2270-4acb-92e2-7642844f0bf8">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/adoptions" methodName="getAdoptions" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="GET adoptions" id="b783b090-5cca-4763-820b-30f0b3b0cfc6" mediaType="application/json">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request/>
+            <con:originalUri>http://localhost/api/adoptions</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="540b400d-dded-42a1-b9e6-8379c7a2f82b" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="POST adoptions" id="03b4a83b-9219-41f0-a7ac-7ee26919570c">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/adoptions" methodName="postAdoption" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="POST adoptions" id="3df203d6-3dc5-4656-b401-65594e2d70fe" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{\r
+  "pets" : [ "${#[Pets and Adoptions API - Tests#/pets Test Case#POST pets]#Response#$['id']}" ],\r
+  "location" : "${#[Pets and Adoptions API - Tests#/pets Test Case#POST pets]#Response#$['location']}"\r
+}</con:request>
+            <con:originalUri>http://localhost/api/adoptions</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="ec97cb9f-90a3-4509-aa8f-a209964c1055" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="transfer" name="Transfer adoptionId" id="c0c44b28-090a-4449-81df-f03bd3667d46">
+        <con:settings/>
+        <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false">
+            <con:name>id</con:name>
+            <con:sourceType>Response</con:sourceType>
+            <con:sourceStep>POST adoptions</con:sourceStep>
+            <con:sourcePath>$['id']</con:sourcePath>
+            <con:targetType>id</con:targetType>
+            <con:targetStep>PATCH and Approve Adoption</con:targetStep>
+            <con:targetPath/>
+            <con:type>JSONPATH</con:type>
+            <con:upgraded>true</con:upgraded>
+          </con:transfers>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="PATCH and Approve Adoption" id="354a433c-19c8-430d-a31c-8ba53175eb2b">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/adoptions/{id}" methodName="patchAdoptionStatus" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="PATCH and Approve Adoption" id="81b331d7-ac73-4c23-a6c9-0e73c41ee67b" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{\r
+  "status" : "approved"\r
+}</con:request>
+            <con:originalUri>http://localhost/api/adoptions/6e168e2f-cbd7-4ee8-805b-f0b2d058ca4d</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="83894b53-9435-43ad-b07e-0451f166805b" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="DataAndMetadataAssertion" id="71df06b3-f21a-4bb8-8928-5e3037ddbde0" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['pets'][0]</con:path>
+                  <con:element>0</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>false</con:enabled>
+                  <con:expectedValue>74831936-7848-4e47-bf52-033785f2d142</con:expectedValue>
+                  <con:caseSensitive>false</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>false</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>false</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>false</con:enabled>
+                  <con:expectedValue>6e168e2f-cbd7-4ee8-805b-f0b2d058ca4d</con:expectedValue>
+                  <con:caseSensitive>false</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>approved</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"pets":["74831936-7848-4e47-bf52-033785f2d142"],"location":"Galway","id":"6e168e2f-cbd7-4ee8-805b-f0b2d058ca4d","status":"approved"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters>
+              <con:entry key="id" value="6caec49c-dec1-40c6-a0b3-1f4c7df7fdce"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:properties/>
+    <con:reportParameters/>
+  </con:testSuite>
+  <con:testSuite id="89b780d6-46f5-4042-8c12-1c8464c491d9" name="(Multi-Protocol) - Add PET - Update status - Verify events">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase id="73cf57c6-4a71-4039-b3c3-8a339a626ac9" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Add Pet and verify event" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe to pets.added topic" id="3170764d-fa61-4ed9-a108-9fb87e7a3859">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>f1a87fe0-7dad-4448-963a-62ca07aae60e</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>pets.added</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>{{kafka</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:connectionSettings>
+                  <con:subscribeProperties/>
+                  <con:schemaRegistry/>
+                  <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+                  <con:maxIdleTime>5</con:maxIdleTime>
+                  <con:maxMessagesReceived>1</con:maxMessagesReceived>
+                  <con:maxRunTime>5</con:maxRunTime>
+                  <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
+                </con:connectionSettings>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>60</con:maxIdleTime>
+            <con:maxMessagesReceived>50</con:maxMessagesReceived>
+            <con:maxRunTime>60</con:maxRunTime>
+            <con:assertion type="JsonPath Existence Match" id="de80b5af-72a2-4d14-b284-621f5e8f7993" name="JSONPath Existence Match">
+              <con:configuration>
+                <path>$.name</path>
+                <content>true</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="DataAndMetadataAssertion" id="ae163c5e-6a9b-4517-885b-7bf9a9d3a28e" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>TobyPost</con:expectedValue>
+                  <con:caseSensitive>false</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>9</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>9</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>onhold</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>12</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>8483193c-7848-4d47-bf52-033785f2d009</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{
+  "name": "Sam",
+  "location": "Galway",
+  "status": "onhold",
+  "id": "8483193c-7848-4d47-bf52-033785f2d009"
+}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="POST pets" id="2a8e90a9-8284-4f99-b3bd-c07f8e9a58a4">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/pets" methodName="postPet" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="POST pets" id="5d072644-d94a-464c-bd56-0dcfc812b64f" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{\r
+  "name" : "TobyPost",\r
+  "location" : "Galway",\r
+  "status" : "onhold"\r
+}</con:request>
+            <con:originalUri>http://localhost/api/pets</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="2ec9cdbd-46ef-47a7-b2a2-f1da90cf9b3e" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="DataAndMetadataAssertion" id="0718ac4d-5ecb-4f4b-bff0-e57ba9e9b9fc" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>TobyPost</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>onhold</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>false</con:enabled>
+                  <con:expectedValue>169ffbf1-b5d9-4056-bfa9-708c77692f62</con:expectedValue>
+                  <con:caseSensitive>false</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"name":"Toby","location":"Galway","status":"available","id":"169ffbf1-b5d9-4056-bfa9-708c77692f62"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters/>
+            <con:parameterOrder/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+      <con:breakPoints>
+        <con:testStepId>3170764d-fa61-4ed9-a108-9fb87e7a3859</con:testStepId>
+        <con:status>NONE</con:status>
+        <con:properties/>
+      </con:breakPoints>
+      <con:breakPoints>
+        <con:testStepId>2a8e90a9-8284-4f99-b3bd-c07f8e9a58a4</con:testStepId>
+        <con:status>NONE</con:status>
+        <con:properties/>
+      </con:breakPoints>
+    </con:testCase>
+    <con:testCase id="bf11b710-7edd-431e-ae2f-facdba90711a" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Update pet status and verify statusChanged event" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="restrequest" name="PATCH pet request" id="3ab8eecf-6e18-475a-8f8d-793895f15454">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/pets/{id}" methodName="patchPetStatus" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="PATCH pet request" id="35cc33ed-3ef3-4e1f-816d-a5297e900d78" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{\r
+  "status" : "available"\r
+}</con:request>
+            <con:originalUri>http://localhost/api/pets/</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="812b6cad-c783-447a-b501-6834902a50a7" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="DataAndMetadataAssertion" id="70628f27-a63c-4e0d-8135-5fdae8c7132a" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>TobyPost</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>available</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>${#[(Multi-Protocol) - Add PET - Update status - Verify events#Add Pet and verify event#POST pets]#Response#$['id']}</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"name":"TobyPost","location":"Galway","status":"available","id":"513409d6-26fd-4f97-a694-018252b5b2f8"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters>
+              <con:entry key="id" value="${#[(Multi-Protocol) - Add PET - Update status - Verify events#Add Pet and verify event#POST pets]#Response#$['id']}"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe to pets.statusChanged topic" id="847a5b14-54db-4062-9604-045155c4fea4">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>87fb3d7c-7d76-4028-afd3-62c6749c4d51</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>pets.statusChanged</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:authProfile>Inherit From Parent</con:authProfile>
+                <con:connectionSettings>
+                  <con:subscribeProperties/>
+                  <con:schemaRegistry/>
+                  <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+                  <con:maxIdleTime>5</con:maxIdleTime>
+                  <con:maxMessagesReceived>1</con:maxMessagesReceived>
+                  <con:maxRunTime>5</con:maxRunTime>
+                  <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
+                </con:connectionSettings>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>60</con:maxIdleTime>
+            <con:maxMessagesReceived>50</con:maxMessagesReceived>
+            <con:maxRunTime>60</con:maxRunTime>
+            <con:assertion type="DataAndMetadataAssertion" id="aed037ca-b1f5-4424-b9e3-609855027f33" name="Smart Assertion">
+              <con:configuration xsi:type="con:DataAndMetadataAssertion">
+                <con:mode>Received Data</con:mode>
+                <con:elements>
+                  <con:path>$['name']</con:path>
+                  <con:element>name</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>TobyPost</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['location']</con:path>
+                  <con:element>location</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>Galway</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['status']</con:path>
+                  <con:element>status</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>${PATCH pet request#Response#$['status']}</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:elements>
+                  <con:path>$['id']</con:path>
+                  <con:element>id</con:element>
+                  <con:operatorId>1</con:operatorId>
+                  <con:enabled>true</con:enabled>
+                  <con:expectedValue>${PATCH pet request#Response#$['id']}</con:expectedValue>
+                  <con:caseSensitive>true</con:caseSensitive>
+                  <con:numberType>false</con:numberType>
+                  <con:expectedDataType>1</con:expectedDataType>
+                </con:elements>
+                <con:originalMessage>{"name":"TobyPost","location":"Galway","status":"available","id":"513409d6-26fd-4f97-a694-018252b5b2f8"}</con:originalMessage>
+              </con:configuration>
+            </con:assertion>
+            <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:properties/>
+    <con:reportParameters/>
+  </con:testSuite>
+  <con:testSuite id="ec12743e-3e49-43a5-bd2b-7f1819d57932" name="(Multi-protocol) - Adopt an available Pet - Verify events">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase id="a0e925e8-21e7-4519-a3c2-839e562905d2" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Adopt available Pet" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="restrequest" name="GET available pets" id="369a1831-8b75-400b-8d34-4fd8bc05e092">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" methodName="getPets" resourcePath="/pets" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="GET available pets" id="d0999129-0b2f-43cd-81f6-60e04f5a75bb" mediaType="application/json">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request/>
+            <con:originalUri>http://localhost/api/pets</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="6629ac48-2e69-4d99-993c-572839de2876" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Response SLA Assertion" id="b414256c-c6d2-42ea-ae23-e919f755b2e7" name="Response SLA">
+              <con:configuration>
+                <SLA>2000</SLA>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters>
+              <con:entry key="location" value="Galway"/>
+              <con:entry key="status" value="available"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe to adoptions.requested" id="43d9cdcb-054f-4a58-bced-bbe08c50feff">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>bdf59e2b-01e0-49a5-a761-e0ddcd5568f9</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>adoptions.requested</con:channelName>
+            <con:serviceName>Petstore Kafka - Adoptions</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:connectionSettings>
+                  <con:subscribeProperties/>
+                  <con:schemaRegistry/>
+                  <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+                  <con:maxIdleTime>5</con:maxIdleTime>
+                  <con:maxMessagesReceived>1</con:maxMessagesReceived>
+                  <con:maxRunTime>5</con:maxRunTime>
+                  <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+                </con:connectionSettings>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>60</con:maxIdleTime>
+            <con:maxMessagesReceived>50</con:maxMessagesReceived>
+            <con:maxRunTime>60</con:maxRunTime>
+            <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="POST adoption request" id="86de086e-2ba7-49f0-bbf6-d59cae8eb79b">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" methodName="postAdoption" resourcePath="/adoptions" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="POST adoption request" id="69183095-56c6-495b-b0a2-c85571989388" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{
+  "pets" : [ "${GET available pets#Response#$[0]['id']}" ],
+  "location" : "${GET available pets#Response#$[0]['location']}"
+}</con:request>
+            <con:originalUri>http://localhost/api/adoptions</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="3787b306-2d97-42b7-9bf5-bf12f381fc47" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Response SLA Assertion" id="d60bf72a-e14e-4f1a-8afe-a3985b00fa7a" name="Response SLA">
+              <con:configuration>
+                <SLA>2000</SLA>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="multiConfigureTestStep" name="Subscribe to pets.statusChanged" id="3ba6e085-9bbc-4260-9e2c-21cbb22dc5f4">
+        <con:settings/>
+        <con:config activeStep="kafkaSubscribeTestStep" xsi:type="con:MultiConfigurationStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:kafkaSubscribeStep>
+            <con:operationId>87fb3d7c-7d76-4028-afd3-62c6749c4d51</con:operationId>
+            <con:operationName>Subscribe</con:operationName>
+            <con:channelName>pets.statusChanged</con:channelName>
+            <con:serviceName>Petstore Kafka - Pets</con:serviceName>
+            <con:endpoint>kafka:9092</con:endpoint>
+            <con:connectionProperties/>
+            <con:schemaRegistry/>
+            <con:environmentSpec>
+              <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+                <con:authProfile>Inherit From Parent</con:authProfile>
+                <con:connectionSettings>
+                  <con:subscribeProperties/>
+                  <con:schemaRegistry/>
+                  <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+                  <con:maxIdleTime>5</con:maxIdleTime>
+                  <con:maxMessagesReceived>1</con:maxMessagesReceived>
+                  <con:maxRunTime>5</con:maxRunTime>
+                  <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+                </con:connectionSettings>
+              </con:entry>
+            </con:environmentSpec>
+            <con:messageType>JSON</con:messageType>
+            <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+            <con:maxIdleTime>60</con:maxIdleTime>
+            <con:maxMessagesReceived>50</con:maxMessagesReceived>
+            <con:maxRunTime>60</con:maxRunTime>
+            <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+          </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="Approve Adoption via PATCH" id="bbc6eba6-40a6-4bb9-827a-ca4f8f8abca5">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/adoptions/{id}" methodName="patchAdoptionStatus" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="Approve Adoption via PATCH" id="81b331d7-ac73-4c23-a6c9-0e73c41ee67b" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request>{\r
+  "status" : "approved"\r
+}</con:request>
+            <con:originalUri>http://localhost/api/adoptions/</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="acc3d5e8-c62c-4b79-9bfa-8f56261a85e3" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Response SLA Assertion" id="4601031a-4a24-4569-a04b-f724bec1aae2" name="Response SLA">
+              <con:configuration>
+                <SLA>200</SLA>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters>
+              <con:entry key="id" value="${POST adoption request#Response#$['id']}"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="GET pets and verify status" id="45267a58-dd2d-4260-8270-351e6e84f381">
+        <con:settings/>
+        <con:config service="Pets and Adoption API" resourcePath="/pets" methodName="getPets" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="GET pets and verify status" id="7e699173-300b-44bf-9076-d1d6545aabc6" mediaType="application/json">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+            </con:settings>
+            <con:endpoint>http://localhost:80/api</con:endpoint>
+            <con:request/>
+            <con:originalUri>http://localhost/api/pets</con:originalUri>
+            <con:assertion type="Valid HTTP Status Codes" id="0f0c00d5-5e43-4447-9a20-74bfa221c415" name="Valid HTTP Status Codes">
+              <con:settings/>
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Response SLA Assertion" id="b7987605-b807-42f0-8a99-34dd53b22395" name="Response SLA">
+              <con:configuration>
+                <SLA>2000</SLA>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="6d4c3760-0b35-47fe-845c-b40368f7dab2" name="JSONPath Match">
+              <con:configuration>
+                <path>$.[?(@.id=='${GET available pets#Response#$[0]['id']}')].status</path>
+                <content>[adopted]</content>
+                <allowWildcards>true</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:parameters>
+              <con:entry key="location" value="Galway"/>
+              <con:entry key="status" value="adopted"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:properties/>
+    <con:reportParameters/>
+  </con:testSuite>
+  <con:requirements/>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:databaseConnectionContainer/>
+  <con:jmsConnectionContainer/>
+  <con:oAuth2ProfileContainer/>
+  <con:oAuth1ProfileContainer/>
+  <con:reporting>
+    <con:xmlTemplates/>
+    <con:parameters/>
+  </con:reporting>
+  <con:eventHandlers type="RequestFilter.filterRequest" name="RequestFilter.filterRequest">
+    <con:script>// Sample event script to add custom HTTP header to all outgoing REST, SOAP and HTTP(S) calls
+// This code is often used for adding custom authentication to ReadyAPI functional tests
+
+// If hardcoding the token, uncomment and change line 5
+// token = '4567'
+
+// If your token is parameterized in Project level custom property, uncomment line 8
+// token = request.parent.testCase.testSuite.project.getProperty('auth_token').getValue()
+
+// To modify all outgoing calls, remove comments from lines 11 to 16
+// headers = request.requestHeaders
+// if (headers.containsKey('auth_token2') == false) {
+//   headers.put('auth_token2', token)
+//   request.requestHeaders = headers
+// }</con:script>
+  </con:eventHandlers>
+  <con:eventHandlers type="TestRunListener.afterStep" name="TestRunListener.afterStep">
+    <con:script>// Save all test step results into files
+// Change the directory path in line 5 to a location where you want to store details
+// then uncomment lines 5 to 10
+
+// filePath = 'C:\\tempOutputDirectory\\'
+// fos = new java.io.FileOutputStream(filePath + testStepResult.testStep.label + '.txt', true)
+// pw = new java.io.PrintWriter(fos)
+// testStepResult.writeTo(pw)
+// pw.close()
+// fos.close()</con:script>
+  </con:eventHandlers>
+  <con:environment id="e51b1cc5-5745-4520-9ab0-7089e48ad5a1" name="Kafka Docker local" index="0">
+    <con:service type="Message-Driven" name="Petstore Kafka - Pets">
+      <con:endpoint authProfile="No Authorization" connectionSettingsId="43c29a23-ed0e-41be-82f7-155c1f868d44" proxyHost="" proxyPort="" proxyUsername="" proxyPassword="">127.0.0.1:9092</con:endpoint>
+    </con:service>
+    <con:service type="REST" name="Pets and Adoption API">
+      <con:endpoint authProfile="No Authorization" proxyHost="" proxyPort="" proxyUsername="" proxyPassword="">http://localhost:80/api</con:endpoint>
+    </con:service>
+    <con:service type="Message-Driven" name="Petstore Kafka - Adoptions">
+      <con:endpoint authProfile="No Authorization" connectionSettingsId="dcf33721-7d82-4ea9-a61e-0308c97cb611" proxyHost="" proxyPort="" proxyUsername="" proxyPassword="">127.0.0.1:9092</con:endpoint>
+    </con:service>
+    <con:databaseConnectionContainer/>
+    <con:jmsConnectionContainer/>
+  </con:environment>
+  <con:authRepository/>
+  <con:environmentSpec>
+    <con:entry environmentId="e51b1cc5-5745-4520-9ab0-7089e48ad5a1">
+      <con:authProfile>No Authorization</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+  <con:tags/>
+  <con:kafkaConnectionSettingsContainer>
+    <con:connectionSettings id="43c29a23-ed0e-41be-82f7-155c1f868d44">
+      <con:subscribeProperties/>
+      <con:publishProperties/>
+      <con:schemaRegistry>
+        <con:url/>
+        <con:authProfile>No Authorization</con:authProfile>
+      </con:schemaRegistry>
+      <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+      <con:maxIdleTime>60</con:maxIdleTime>
+      <con:maxMessagesReceived>50</con:maxMessagesReceived>
+      <con:maxRunTime>60</con:maxRunTime>
+      <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+    </con:connectionSettings>
+    <con:connectionSettings id="dcf33721-7d82-4ea9-a61e-0308c97cb611">
+      <con:subscribeProperties/>
+      <con:publishProperties/>
+      <con:schemaRegistry>
+        <con:url/>
+        <con:authProfile>No Authorization</con:authProfile>
+      </con:schemaRegistry>
+      <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
+      <con:maxIdleTime>60</con:maxIdleTime>
+      <con:maxMessagesReceived>50</con:maxMessagesReceived>
+      <con:maxRunTime>60</con:maxRunTime>
+      <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+    </con:connectionSettings>
+  </con:kafkaConnectionSettingsContainer>
+</con:soapui-project>
