@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project id="afd2e5e3-5d86-4d1b-9a3e-61d8f6649ea2" created="3.44.1" activeEnvironment="Default environment" name="Kafka-Petstore-Adding-Pets" projectVersion="" updated="3.44.1 2023-03-15T15:35:59Z" xmlns:con="http://eviware.com/soapui/config">
+<con:soapui-project id="afd2e5e3-5d86-4d1b-9a3e-61d8f6649ea2" created="3.44.1" activeEnvironment="Default environment" name="Kafka-Petstore-Adding-Pets" projectVersion="" updated="3.44.1 2023-03-15T15:35:59Z" encryptionMode="Not encrypted" xmlns:con="http://eviware.com/soapui/config">
   <con:settings/>
   <con:interface xsi:type="con:RestService" id="c69890e3-fea7-4c21-9cae-f5f4c7159df8" name="Pets and Adoption API" type="rest_ex" wadlVersion="https://swagger.io/openapiv3/specification" definitionUrl="https://api.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <con:description>An API for tracking **Pets** and **Pet Adoptions** across our event and REST based petstore. This OpenAPI definition describes the RESTful APIs offered by the store.
@@ -56,6 +56,10 @@ Other useful information related to this API:</con:description>
         <con:request name="Request 1" id="3d885ab4-f33a-44e4-9369-766c81513ad7" mediaType="application/json">
           <con:settings/>
           <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
           <con:parameters/>
         </con:request>
       </con:method>
@@ -94,6 +98,10 @@ Other useful information related to this API:</con:description>
   "id" : "a76b67cb-7976-4b94-af8e-381688c915ad",\r
   "status" : "available"\r
 }</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
           <con:parameters/>
         </con:request>
       </con:method>
@@ -136,6 +144,10 @@ Other useful information related to this API:</con:description>
           <con:request>{\r
   "status" : "available"\r
 }</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
           <con:parameters/>
         </con:request>
       </con:method>
@@ -176,6 +188,10 @@ Other useful information related to this API:</con:description>
         <con:request name="Request 1" id="94d9274c-9a73-40ad-bd5f-7287e8995dea" mediaType="application/json">
           <con:settings/>
           <con:endpoint>http://localhost:80/api</con:endpoint>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
           <con:parameters/>
         </con:request>
       </con:method>
@@ -213,6 +229,10 @@ Other useful information related to this API:</con:description>
   "pets" : [ "string" ],\r
   "location" : "string"\r
 }</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
           <con:parameters/>
         </con:request>
       </con:method>
@@ -258,6 +278,10 @@ Other useful information related to this API:</con:description>
           <con:request>{\r
   "status" : "approved"\r
 }</con:request>
+          <con:credentials>
+            <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
           <con:parameters/>
         </con:request>
       </con:method>
@@ -357,7 +381,7 @@ components:
   <con:testSuite id="e8d47585-4bef-41ce-b762-62f6eed58245" name="(Multi-protocol) - Add Pet and verify events">
     <con:settings/>
     <con:runType>PARALLELL</con:runType>
-    <con:testCase id="a9ac9976-ca38-4e16-8203-a3792a86f3f2" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Add Pet and verify pets.added event" searchProperties="true" timeout="0">
+    <con:testCase id="a9ac9976-ca38-4e16-8203-a3792a86f3f2" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Verify pets.added event" searchProperties="true" timeout="0">
       <con:settings/>
       <con:testStep type="multiConfigureTestStep" name="Subscribe to pets.added and verify message" id="1e969919-45c0-45d2-a341-3f61d8a6014b">
         <con:settings/>
@@ -372,9 +396,9 @@ components:
             <con:schemaRegistry/>
             <con:messageType>JSON</con:messageType>
             <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
-            <con:maxIdleTime>6</con:maxIdleTime>
-            <con:maxMessagesReceived>5</con:maxMessagesReceived>
-            <con:maxRunTime>6</con:maxRunTime>
+            <con:maxIdleTime>5</con:maxIdleTime>
+            <con:maxMessagesReceived>1</con:maxMessagesReceived>
+            <con:maxRunTime>4</con:maxRunTime>
             <con:assertion type="DataAndMetadataAssertion" id="1062ac10-73ae-4cab-b8ec-b4eb4416ccc5" name="Smart Assertion">
               <con:configuration xsi:type="con:DataAndMetadataAssertion">
                 <con:mode>Received Data</con:mode>
@@ -423,6 +447,17 @@ components:
             </con:assertion>
             <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
           </con:kafkaSubscribeStep>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+      <con:reportParameters/>
+    </con:testCase>
+    <con:testCase id="ef962c79-76ea-42ef-a572-b36f11a44917" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Add a Pet" searchProperties="true" timeout="0">
+      <con:settings/>
+      <con:testStep type="delay" name="Delay - ms" id="1a3dad77-add4-4671-bda9-579762666391">
+        <con:settings/>
+        <con:config>
+          <delay>200</delay>
         </con:config>
       </con:testStep>
       <con:testStep type="restrequest" name="POST pets" id="38fb39f4-3843-4c5a-b125-33826bb38936">

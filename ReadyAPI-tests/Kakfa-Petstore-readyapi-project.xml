@@ -590,10 +590,10 @@ components:
                   <con:subscribeProperties/>
                   <con:schemaRegistry/>
                   <con:closeConditionType>ANY_CONDITION</con:closeConditionType>
-                  <con:maxIdleTime>10</con:maxIdleTime>
+                  <con:maxIdleTime>5</con:maxIdleTime>
                   <con:maxMessagesReceived>50</con:maxMessagesReceived>
                   <con:maxRunTime>5</con:maxRunTime>
-                  <con:ignoreMessagesBeforeConnect>false</con:ignoreMessagesBeforeConnect>
+                  <con:ignoreMessagesBeforeConnect>true</con:ignoreMessagesBeforeConnect>
                 </con:connectionSettings>
               </con:entry>
             </con:environmentSpec>
@@ -1087,7 +1087,7 @@ components:
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:parameters>
-              <con:entry key="id" value="fe85a19c-7641-400c-885b-670efa4b94d7"/>
+              <con:entry key="id" value="6899480a-f659-4f98-a456-9944924fdc96"/>
             </con:parameters>
           </con:restRequest>
         </con:config>
@@ -1237,7 +1237,7 @@ components:
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:parameters>
-              <con:entry key="id" value="a95e7b29-75b0-41f9-9a73-2fa93c7c9b5b"/>
+              <con:entry key="id" value="6caec49c-dec1-40c6-a0b3-1f4c7df7fdce"/>
             </con:parameters>
           </con:restRequest>
         </con:config>
@@ -1631,6 +1631,7 @@ components:
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:parameters>
+              <con:entry key="location" value="Galway"/>
               <con:entry key="status" value="available"/>
             </con:parameters>
           </con:restRequest>
