@@ -3,25 +3,37 @@
 This is a contrived demo of a petstore with adoptions.
 It is build on Kafka topics written in Nodejs.
 
-It exists as a functional example for describing with AsyncAPI.
+It exists as a functional example for describing with AsyncAPI and OpenAPI.
 
 You can see a live demo of this running at https://petstore-kafka.swagger.io
 
 > NOTE: Given the way Kafka rebalances and the need for cacheing, it may take a while (a few minutes) for caches to be built, depending on the size of the Topic.
 
 
-## Architecture
+## User Flows
 
-- TODO: Add miro diagram.
-- TODO: Add AsyncAPI definition(s)
+![image](https://user-images.githubusercontent.com/8438485/228814936-378faa65-809f-412d-95a2-ee59c6bad7f1.png)
+
+
+## Technical stack
+
+![image](https://user-images.githubusercontent.com/8438485/228814110-04ec68e6-4e2e-4d91-9977-d243e2b55a59.png)
 
 - There is a browser app (SPA) written in Typescript using Create-React-APP, it's found under [[./web-ui]].
 - There is a gateway for serving the SPA and proxying API calls to the other services. It is also under [[./web-ui]] and is a single Caddyfile.
-- There is a Pets service (nodejs + kafka sink). [[./services/pets]]
-- There is a Adoptions service (nodejs + kafka sink). [[./services/adoptions]]
-- There is a Websocket service (nodejs + kafka sink + publishes events). [[./services/websocket]]
-- There is a docker-compose file just for Kafka services. [[./services/kafka]].
-- There is a docker-compose file for the whole stack, [[./docker-compose.yml]].
+- There is a Pets service (nodejs + kafka sink) [[./services/pets]].
+- There is a Adoptions service (nodejs + kafka sink) [[./services/adoptions]].
+- There is a Websocket service (nodejs + kafka sink + publishes events) [[./services/websocket]].
+- There is a docker-compose file just for Kafka services [[./services/kafka/docker-compose.yml]].
+- There is a docker-compose file for the whole stack [[./docker-compose.yml]].
+
+
+## OpenAPI and AsyncAPI
+
+- OpenAPI for **Gateway** (includes both Pets and Adoptiosn services) https://app.swaggerhub.com/apis/SwaggerPMTests/Pets-Adoption-API
+- AsyncAPI for **Pets** service https://app.swaggerhub.com/apis/SwaggerPMTests/petstore-kafka-pets
+- AsyncAPI for **Adoptions** service https://app.swaggerhub.com/apis/SwaggerPMTests/petstore-kafka-adoptions
+
 
 ## Developing
 
