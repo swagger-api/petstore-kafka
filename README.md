@@ -23,7 +23,9 @@ You can see a live demo of this running at https://petstore-kafka.swagger.io
 - There is a docker-compose file for the whole stack [[./docker-compose.yml]].
 
 ## User Flows
-![image](https://user-images.githubusercontent.com/8438485/228813938-4691d4c0-61d0-4c46-9cc1-165ec3bb5ce7.png)
+
+![image](https://user-images.githubusercontent.com/8438485/228814936-378faa65-809f-412d-95a2-ee59c6bad7f1.png)
+
 
 ## Technical stack
 
