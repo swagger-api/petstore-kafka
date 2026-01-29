@@ -14,7 +14,7 @@
 		"kafkajs": "^2.0.2",
 		"morgan": "^1.10.0",
 		"uuid": "^8.3.2",
-		"ws": "^8.7.0"
+		"ws": "^8.17.1"
 	},
 	"devDependencies": {
 		"nodemon": "^2.0.16"
