@@ -13,7 +13,7 @@
 		"express": "^4.22.0",
 		"flat-file-db": "^1.0.0",
 		"kafkajs": "^2.0.2",
-		"morgan": "^1.10.0",
+		"morgan": "^1.11.0",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
