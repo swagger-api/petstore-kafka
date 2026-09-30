@@ -218,6 +218,8 @@ app.get('/api/adoptions', (req, res) => {
 app.post('/api/adoptions', (req, res) => {
   const adoption = req.body
   adoption.id = adoption.id || uuid.v4()
+  // Record the requesting user as the owner so later modifications can be authorized
+  adoption.ownerId = req.header('x-user-id') || adoption.ownerId
 
   // TODO: Some validation of the body
 
