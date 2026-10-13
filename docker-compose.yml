@@ -63,7 +63,7 @@ services:
 
   # Kafka services
   zookeeper:
-    image: docker.io/bitnami/zookeeper:3.8
+    image: docker.io/soldevelo/zookeeper:3.8
     volumes:
       - "zookeeper_data:/bitnami"
     environment:
